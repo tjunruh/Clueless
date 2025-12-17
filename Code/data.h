@@ -31,6 +31,9 @@ public:
 	void record_turn(int round, int asking_player_turn_order, const std::string& suspect, const std::string& room, const std::string& weapon, int answering_player_turn_order);
 	turn get_turn(int round, int asking_player_turn_order);
 	void set_one_of_each_murder_element(bool one_of_each);
+	bool get_one_of_each_murder_element();
+	void set_game_name(const std::string& name);
+	std::string get_game_name();
 	std::vector<player_cards> investigate();
 	int save(const std::string& path);
 	int load(const std::string& path);
@@ -46,6 +49,7 @@ private:
 	bool eliminate_cards_based_on_cards(std::vector<player_cards>& card_data);
 	bool add_cards_based_on_cards(std::vector<player_cards>& card_data);
 	bool add_cards_based_on_eliminated_cards(std::vector<player_cards>& card_data);
+	bool loaded_data_valid(const nlohmann::json& game_data);
 
 
 	struct player_name_turn_order_container
@@ -56,6 +60,7 @@ private:
 
 	unsigned int number_of_players = 0;
 	bool one_of_each_murder_element = true;
+	std::string game_name = "";
 
 	std::vector<player_name_turn_order_container> players;
 	std::vector<turn> turn_history;

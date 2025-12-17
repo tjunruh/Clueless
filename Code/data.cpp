@@ -1,5 +1,6 @@
 #include "data.h"
 #include <ascii_engine/file_manager.h>
+#include <ascii_engine/error_codes.h>
 
 void data::set_number_of_players(unsigned int number)
 {
@@ -71,6 +72,26 @@ data::turn data::get_turn(int round, int asking_player_turn_order)
 	}
 
 	return player_turn;
+}
+
+void data::set_one_of_each_murder_element(bool one_of_each)
+{
+	one_of_each_murder_element = one_of_each;
+}
+
+bool data::get_one_of_each_murder_element()
+{
+	return one_of_each_murder_element;
+}
+
+void data::set_game_name(const std::string& name)
+{
+	game_name = name;
+}
+
+std::string data::get_game_name()
+{
+	return game_name;
 }
 
 std::vector<data::player_cards> data::investigate()
@@ -349,4 +370,170 @@ bool data::add_cards_based_on_eliminated_cards(std::vector<player_cards>& card_d
 	}
 
 	return card_data_modified;
+}
+
+int data::save(const std::string& path)
+{
+	nlohmann::json game_data;
+
+	game_data["game_name"] = game_name;
+	game_data["number_of_players"] = number_of_players;
+	game_data["one_of_each_murder_element"] = one_of_each_murder_element;
+
+	nlohmann::json total_turn_data;
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		nlohmann::json turn_data;
+		turn_data["round"] = turn_history[i].round;
+		turn_data["asking_player_turn_order"] = turn_history[i].asking_player_turn_order;
+		turn_data["suspect"] = turn_history[i].suspect;
+		turn_data["room"] = turn_history[i].room;
+		turn_data["weapon"] = turn_history[i].weapon;
+		turn_data["answering_player_turn_order"] = turn_history[i].answering_player_turn_order;
+		turn_data["known_card"] = turn_history[i].known_card;
+		total_turn_data.push_back(turn_data);
+	}
+
+	game_data["turn_history"] = total_turn_data;
+	game_data["guilty_suspect"] = guilty_suspect;
+	game_data["murder_room"] = murder_room;
+	game_data["murder_weapon"] = murder_weapon;
+
+	int status = file_manager::write_file(path, game_data.dump(3));
+	return status;
+}
+
+int data::load(const std::string& path)
+{
+	std::string content = "";
+	int load_status = file_manager::read_file(path, content);
+	int status = UNDEFINED;
+
+	if (load_status == 0)
+	{
+		nlohmann::json game_data = nlohmann::json::parse(content, nullptr, false);
+
+		if (loaded_data_valid(game_data))
+		{
+			game_name = game_data["game_name"];
+			number_of_players = game_data["number_of_players"];
+			one_of_each_murder_element = game_data["one_of_each_murder_element"];
+
+			turn_history.clear();
+			nlohmann::json turn_history_data = game_data["turn_history"];
+			for (auto itr = turn_history_data.begin(); itr != turn_history_data.end(); ++itr)
+			{
+				turn turn_data;
+				turn_data.round = (*itr)["round"];
+				turn_data.asking_player_turn_order = (*itr)["asking_player_turn_order"];
+				turn_data.suspect = (*itr)["suspect"];
+				turn_data.room = (*itr)["room"];
+				turn_data.weapon = (*itr)["weapon"];
+				turn_data.answering_player_turn_order = (*itr)["answering_player_turn_order"];
+				turn_data.known_card = (*itr)["known_card"];
+				turn_history.push_back(turn_data);
+			}
+
+			guilty_suspect = game_data["guilty_suspect"];
+			murder_room = game_data["murder_room"];
+			murder_weapon = game_data["murder_weapon"];
+
+			status = SUCCESS;
+		}
+		else
+		{
+			status = INVALID_CONFIG;
+		}
+	}
+	else
+	{
+		status = INVALID_PATH;
+	}
+
+	return status;
+}
+
+bool data::loaded_data_valid(const nlohmann::json& game_data)
+{
+	if (game_data.is_discarded())
+	{
+		return false;
+	}
+
+	if (!game_data.contains("game_name") || !game_data["game_name"].is_string())
+	{
+		return false;
+	}
+
+	if (!game_data.contains("number_of_players") || !game_data["number_of_players"].is_number_integer())
+	{
+		return false;
+	}
+
+	if (!game_data.contains("one_of_each_murder_element") || !game_data["one_of_each_murder_element"].is_boolean())
+	{
+		return false;
+	}
+
+	if (!game_data.contains("turn_history") || !game_data["turn_history"].is_array())
+	{
+		return false;
+	}
+
+	if (!game_data.contains("guilty_suspect") || !game_data["guilty_suspect"].is_string())
+	{
+		return false;
+	}
+
+	if (!game_data.contains("murder_room") || !game_data["murder_room"].is_string())
+	{
+		return false;
+	}
+
+	if (!game_data.contains("murder_weapon") || !game_data["murder_weapon"].is_string())
+	{
+		return false;
+	}
+
+	nlohmann::json turn_history_data = game_data["turn_history"];
+
+	for (auto itr = turn_history_data.begin(); itr != turn_history_data.end(); ++itr)
+	{
+		if (!(*itr).contains("round") || !(*itr)["round"].is_number_integer())
+		{
+			return false;
+		}
+
+		if (!(*itr).contains("asking_player_turn_order") || !(*itr)["asking_player_turn_order"].is_number_integer())
+		{
+			return false;
+		}
+
+		if (!(*itr).contains("suspect") || !(*itr)["suspect"].is_string())
+		{
+			return false;
+		}
+
+		if (!(*itr).contains("room") || !(*itr)["room"].is_string())
+		{
+			return false;
+		}
+
+		if (!(*itr).contains("weapon") || !(*itr)["weapon"].is_string())
+		{
+			return false;
+		}
+
+		if (!(*itr).contains("answering_player_turn_order") || !(*itr)["answering_player_turn_order"].is_number_integer())
+		{
+			return false;
+		}
+
+		if (!(*itr).contains("known_card") || (*itr)["known_card"].is_string())
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
