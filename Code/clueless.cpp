@@ -4,11 +4,19 @@
 #include <ascii_engine/label.h>
 #include <ascii_engine/ascii_io.h>
 #include <ascii_engine/file_manager.h>
+#include "data.h"
+#include "display.h"
 
 int main()
 {
 	ascii_io::ascii_engine_init(true);
 	frame* home_frame = new frame();
+	frame* initialization_frame = new frame();
+	frame* turn_entry_frame = new frame();
+	frame* report_frame = new frame();
+	frame* control_frame = new frame();
+	display display_manager(initialization_frame, turn_entry_frame, report_frame, control_frame);
+	data database;
 
 	std::string logo_content = "";
 	file_manager::read_file("board_configs/logo.txt", logo_content);
@@ -33,13 +41,21 @@ int main()
 		std::string selection = "";
 		int key_stroke = ascii_io::undefined;
 		initialization_menu.get_selection(selection, key_stroke);
-		if (selection == "Exit")
+		if (selection == "New Game")
+		{
+			display_manager.display_setup(database);
+		}
+		else if (selection == "Exit")
 		{
 			break;
 		}
 	} while (1);
 
 	delete(home_frame);
+	delete(initialization_frame);
+	delete(turn_entry_frame);
+	delete(report_frame);
+	delete(control_frame);
 	ascii_io::show_cursor();
 	ascii_io::ascii_engine_end();
 }
