@@ -24,7 +24,7 @@ all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@ $(LDFLAGS)
-	mkdir $(BLD_DIR)/bin
+	mkdir -p $(BLD_DIR)/bin
 	mv $(EXECUTABLE) $(BLD_DIR)/bin
 	cp external_libraries/$(ASCII_ENGINE_DIR)/Linux/libascii_engine.so $(BLD_DIR)/bin
 	cp -r board_configs $(BLD_DIR)/bin
