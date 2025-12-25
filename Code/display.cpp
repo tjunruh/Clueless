@@ -75,26 +75,31 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	player_2_name_text_box.set_width_multiplier(3.0f);
 	player_2_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_2_name_text_box.set_spacing(0, 1, 0, 0);
+	player_2_name_text_box.set_selectable(false);
 	
 	player_3_name_text_box.use_spacing_width_multipliers(true);
 	player_3_name_text_box.set_width_multiplier(3.0f);
 	player_3_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_3_name_text_box.set_spacing(0, 1, 0, 0);
+	player_3_name_text_box.set_selectable(false);
 
 	player_4_name_text_box.use_spacing_width_multipliers(true);
 	player_4_name_text_box.set_width_multiplier(3.0f);
 	player_4_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_4_name_text_box.set_spacing(0, 1, 0, 0);
+	player_4_name_text_box.set_selectable(false);
 
 	player_5_name_text_box.use_spacing_width_multipliers(true);
 	player_5_name_text_box.set_width_multiplier(3.0f);
 	player_5_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_5_name_text_box.set_spacing(0, 1, 0, 0);
+	player_5_name_text_box.set_selectable(false);
 
 	player_6_name_text_box.use_spacing_width_multipliers(true);
 	player_6_name_text_box.set_width_multiplier(3.0f);
 	player_6_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_6_name_text_box.set_spacing(0, 1, 0, 0);
+	player_6_name_text_box.set_selectable(false);
 
 	cancel_label.set_output("Cancel");
 	cancel_label.add_border(true);
@@ -741,8 +746,8 @@ void display::render_name_text_boxes(int number_of_players)
 	}
 	else if (number_of_players == 2)
 	{
-		player_2_name_text_box.set_selectable(false);
-		player_2_name_text_box.add_border(false);
+		player_2_name_text_box.set_selectable(true);
+		player_2_name_text_box.add_border(true);
 		player_3_name_text_box.set_selectable(false);
 		player_3_name_text_box.add_border(false);
 		player_4_name_text_box.set_selectable(false);
