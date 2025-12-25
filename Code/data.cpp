@@ -67,6 +67,54 @@ void data::record_turn(turn turn_data)
 	turn_history.push_back(turn_data);
 }
 
+void data::reset_suspect(int round, int asking_player_turn_order, const std::string& suspect)
+{
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			turn_history[i].suspect = suspect;
+			break;
+		}
+	}
+}
+
+void data::reset_room(int round, int asking_player_turn_order, const std::string& room)
+{
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			turn_history[i].room = room;
+			break;
+		}
+	}
+}
+
+void data::reset_weapon(int round, int asking_player_turn_order, const std::string& weapon)
+{
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			turn_history[i].weapon = weapon;
+			break;
+		}
+	}
+}
+
+void data::reset_answering_player_turn_order(int round, int asking_player_turn_order, int answering_player_turn_order)
+{
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			turn_history[i].answering_player_turn_order = answering_player_turn_order;
+			break;
+		}
+	}
+}
+
 bool data::turn_recorded(int round, int asking_player_turn_order)
 {
 	bool recorded = false;
@@ -95,6 +143,66 @@ data::turn data::get_turn(int round, int asking_player_turn_order)
 	}
 
 	return player_turn;
+}
+
+std::string data::get_suspect(int round, int asking_player_turn_order)
+{
+	std::string suspect = "";
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			suspect = turn_history[i].suspect;
+			break;
+		}
+	}
+
+	return suspect;
+}
+
+std::string data::get_room(int round, int asking_player_turn_order)
+{
+	std::string room = "";
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			room = turn_history[i].room;
+			break;
+		}
+	}
+
+	return room;
+}
+
+std::string data::get_weapon(int round, int asking_player_turn_order)
+{
+	std::string weapon = "";
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			weapon = turn_history[i].weapon;
+			break;
+		}
+	}
+
+	return weapon;
+}
+
+int data::get_answering_player_turn_order(int round, int asking_player_turn_order)
+{
+	int answering_player_turn_order = -1;
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			answering_player_turn_order = turn_history[i].answering_player_turn_order;
+			break;
+		}
+	}
+
+	return answering_player_turn_order;
 }
 
 void data::set_one_of_each_murder_element(bool one_of_each)

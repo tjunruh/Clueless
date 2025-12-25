@@ -58,6 +58,7 @@ private:
 	menu answering_player_menu;
 	label known_card_label;
 	label back_label;
+	label lock_unlock_label;
 	label forward_label;
 	frame* turn_entry_frame;
 

@@ -27,6 +27,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	answering_player_menu(turn_entry_display, "new line"),
 	known_card_label(turn_entry_display, "new line"),
 	back_label(turn_entry_display, "new line"),
+	lock_unlock_label(turn_entry_display),
 	forward_label(turn_entry_display),
 
 	report_board(report_display, "board_configs/clue_deduction_sheet_config.txt", "default"),
@@ -224,16 +225,25 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	back_label.add_border(true);
 	back_label.use_spacing_width_multipliers(true);
 	back_label.set_width_multiplier(2.0f);
-	back_label.set_spacing_width_multipliers(0.5f, 2.0f);
+	back_label.set_spacing_width_multipliers(0.5f, 0.5f);
 	back_label.set_spacing(4, 0, 0, 0);
 	back_label.set_selectable(true);
+
+	lock_unlock_label.set_output("lock");
+	lock_unlock_label.set_alignment("center");
+	lock_unlock_label.add_border(true);
+	lock_unlock_label.use_spacing_width_multipliers(true);
+	lock_unlock_label.set_width_multiplier(2.0f);
+	lock_unlock_label.set_spacing_width_multipliers(0.5f, 0.5f);
+	lock_unlock_label.set_spacing(4, 0, 0, 0);
+	lock_unlock_label.set_selectable(true);
 
 	forward_label.set_output("Forward -->");
 	forward_label.set_alignment("center");
 	forward_label.add_border(true);
 	forward_label.use_spacing_width_multipliers(true);
 	forward_label.set_width_multiplier(2.0f);
-	forward_label.set_spacing_width_multipliers(2.0f, 0.5f);
+	forward_label.set_spacing_width_multipliers(0.5f, 0.5f);
 	forward_label.set_spacing(4, 0, 0, 0);
 	forward_label.set_selectable(true);
 
@@ -474,6 +484,12 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 	turn_entry_feedback feedback = forward;
 	round_label.set_output("Round: " + std::to_string(round));
 	asking_player_label.set_output("Asking Player: " + database.get_player_name(asking_player_turn_order));
+
+	std::string suspect = "None";
+	std::string room = "None";
+	std::string weapon = "None";
+	std::string answering_player_name = "None";
+
 	if (database.turn_recorded(round, asking_player_turn_order))
 	{
 		data::turn turn_data = database.get_turn(round, asking_player_turn_order);
@@ -483,7 +499,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 		set_weapon_menu_selection(turn_data.weapon);
 		set_answering_player_menu_selection(database.get_player_name(turn_data.answering_player_turn_order));
 		known_card_label.set_output("Known Card: " + turn_data.known_card);
-		suspect_menu.stop_logging();
+		lock_unlock_label.set_output("unlock");
 
 		int selection = ascii_io::undefined;
 
@@ -500,6 +516,76 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 				feedback = forward;
 				break;
 			}
+			else if (selection == lock_unlock_label)
+			{
+				if (lock_unlock_label.get_output() == "lock")
+				{
+					lock_unlock_label.set_output("unlock");
+				}
+				else if (lock_unlock_label.get_output() == "unlock")
+				{
+					lock_unlock_label.set_output("lock");
+				}
+			}
+			else if (lock_unlock_label.get_output() == "lock")
+			{
+				if (selection == suspect_menu)
+				{
+					int key_stroke = ascii_io::undefined;
+					suspect_menu.get_selection(suspect, key_stroke);
+					if (key_stroke != ascii_io::enter)
+					{
+						suspect = "None";
+						set_suspect_menu_selection(database.get_suspect(round, asking_player_turn_order));
+					}
+					else if (suspect != "None")
+					{
+						database.reset_suspect(round, asking_player_turn_order, suspect);
+					}
+				}
+				else if (selection == room_menu)
+				{
+					int key_stroke = ascii_io::undefined;
+					room_menu.get_selection(room, key_stroke);
+					if (key_stroke != ascii_io::enter)
+					{
+						room = "None";
+						set_room_menu_selection(database.get_room(round, asking_player_turn_order));
+					}
+					else if (room != "None")
+					{
+						database.reset_room(round, asking_player_turn_order, room);
+					}
+				}
+				else if (selection == weapon_menu)
+				{
+					int key_stroke = ascii_io::undefined;
+					weapon_menu.get_selection(weapon, key_stroke);
+					if (key_stroke != ascii_io::enter)
+					{
+						weapon = "None";
+						set_weapon_menu_selection(database.get_weapon(round, asking_player_turn_order));
+					}
+					else if (weapon != "None")
+					{
+						database.reset_weapon(round, asking_player_turn_order, weapon);
+					}
+				}
+				else if (selection == answering_player_menu)
+				{
+					int key_stroke = ascii_io::undefined;
+					answering_player_menu.get_selection(answering_player_name, key_stroke);
+					if (key_stroke != ascii_io::enter)
+					{
+						answering_player_name = "None";
+						set_answering_player_menu_selection(database.get_player_name(database.get_answering_player_turn_order(round, asking_player_turn_order)));
+					}
+					else if (answering_player_name != "None")
+					{
+						database.reset_answering_player_turn_order(round, asking_player_turn_order, database.get_player_turn_order(answering_player_name));
+					}
+				}
+			}
 
 		} while(true);
 	}
@@ -509,61 +595,29 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 		room_menu.set_cursor_index(0);
 		weapon_menu.set_cursor_index(0);
 		answering_player_menu.set_cursor_index(0);
+		lock_unlock_label.set_output("lock");
 
 		int selection = ascii_io::undefined;
-		std::string suspect = "None";
-		std::string room = "None";
-		std::string weapon = "None";
-		std::string answering_player_name = "None";
 
 		do
 		{
 			selection = turn_entry_frame->get_selection();
 
-			if (selection == suspect_menu)
-			{
-				int key_stroke = ascii_io::undefined;
-				suspect_menu.get_selection(suspect, key_stroke);
-				if (key_stroke != ascii_io::enter)
-				{
-					suspect = "None";
-					suspect_menu.set_cursor_index(0);
-				}
-			}
-			else if (selection == room_menu)
-			{
-				int key_stroke = ascii_io::undefined;
-				room_menu.get_selection(room, key_stroke);
-				if (key_stroke != ascii_io::enter)
-				{
-					room = "None";
-					room_menu.set_cursor_index(0);
-				}
-			}
-			else if (selection == weapon_menu)
-			{
-				int key_stroke = ascii_io::undefined;
-				weapon_menu.get_selection(weapon, key_stroke);
-				if (key_stroke != ascii_io::enter)
-				{
-					weapon = "None";
-					weapon_menu.set_cursor_index(0);
-				}
-			}
-			else if (selection == answering_player_menu)
-			{
-				int key_stroke = ascii_io::undefined;
-				answering_player_menu.get_selection(answering_player_name, key_stroke);
-				if (key_stroke != ascii_io::enter)
-				{
-					answering_player_name = "None";
-					answering_player_menu.set_cursor_index(0);
-				}
-			}
-			else if (selection == back_label)
+			if (selection == back_label)
 			{
 				feedback = backward;
 				break;
+			}
+			else if (selection == lock_unlock_label)
+			{
+				if (lock_unlock_label.get_output() == "lock")
+				{
+					lock_unlock_label.set_output("unlock");
+				}
+				else if (lock_unlock_label.get_output() == "unlock")
+				{
+					lock_unlock_label.set_output("lock");
+				}
 			}
 			else if (selection == forward_label)
 			{
@@ -579,6 +633,49 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 					turn_data.answering_player_turn_order = database.get_player_turn_order(answering_player_name);
 					database.record_turn(turn_data);
 					break;
+				}
+			}
+			else if (lock_unlock_label.get_output() == "lock")
+			{
+				if (selection == suspect_menu)
+				{
+					int key_stroke = ascii_io::undefined;
+					suspect_menu.get_selection(suspect, key_stroke);
+					if (key_stroke != ascii_io::enter)
+					{
+						suspect = "None";
+						suspect_menu.set_cursor_index(0);
+					}
+				}
+				else if (selection == room_menu)
+				{
+					int key_stroke = ascii_io::undefined;
+					room_menu.get_selection(room, key_stroke);
+					if (key_stroke != ascii_io::enter)
+					{
+						room = "None";
+						room_menu.set_cursor_index(0);
+					}
+				}
+				else if (selection == weapon_menu)
+				{
+					int key_stroke = ascii_io::undefined;
+					weapon_menu.get_selection(weapon, key_stroke);
+					if (key_stroke != ascii_io::enter)
+					{
+						weapon = "None";
+						weapon_menu.set_cursor_index(0);
+					}
+				}
+				else if (selection == answering_player_menu)
+				{
+					int key_stroke = ascii_io::undefined;
+					answering_player_menu.get_selection(answering_player_name, key_stroke);
+					if (key_stroke != ascii_io::enter)
+					{
+						answering_player_name = "None";
+						answering_player_menu.set_cursor_index(0);
+					}
 				}
 			}
 

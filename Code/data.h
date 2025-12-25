@@ -32,8 +32,16 @@ public:
 	std::string get_player_name(int turn_order);
 	int get_player_turn_order(const std::string& name);
 	void record_turn(turn turn_data);
+	void reset_suspect(int round, int asking_player_turn_order, const std::string& suspect);
+	void reset_room(int round, int asking_player_turn_order, const std::string& room);
+	void reset_weapon(int round, int asking_player_turn_order, const std::string& weapon);
+	void reset_answering_player_turn_order(int round, int asking_player_turn_order, int answering_player_turn_order);
 	bool turn_recorded(int round, int asking_player_turn_order);
 	turn get_turn(int round, int asking_player_turn_order);
+	std::string get_suspect(int round, int asking_player_turn_order);
+	std::string get_room(int round, int asking_player_turn_order);
+	std::string get_weapon(int round, int asking_player_turn_order);
+	int get_answering_player_turn_order(int round, int asking_player_turn_order);
 	void set_one_of_each_murder_element(bool one_of_each);
 	bool get_one_of_each_murder_element();
 	void set_game_name(const std::string& name);
