@@ -34,6 +34,9 @@ int main()
 	initialization_menu.enable_quit(false);
 	initialization_menu.build();
 
+	int round = 1;
+	int turn = 0;
+
 	ascii_io::hide_cursor();
 	do
 	{
@@ -43,7 +46,39 @@ int main()
 		initialization_menu.get_selection(selection, key_stroke);
 		if (selection == "New Game")
 		{
-			display_manager.display_setup(database);
+			bool setup_complete = display_manager.display_setup(database);
+			if (setup_complete)
+			{
+				display::turn_entry_feedback feedback = display::turn_entry_feedback::none;
+				do
+				{
+					feedback = display_manager.display_turn_entry(database, round, turn);
+					if (feedback == display::turn_entry_feedback::forward)
+					{
+						if (turn + 1 < database.get_number_of_players())
+						{
+							turn++;
+						}
+						else
+						{
+							turn = 0;
+							round++;
+						}
+					}
+					else if (feedback == display::turn_entry_feedback::backward)
+					{
+						if (turn - 1 >= 0)
+						{
+							turn--;
+						}
+						else if (round - 1 >= 1)
+						{
+							turn = database.get_number_of_players() - 1;
+							round--;
+						}
+					}
+				} while(feedback != display::turn_entry_feedback::save);
+			}
 		}
 		else if (selection == "Exit")
 		{

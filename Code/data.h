@@ -26,11 +26,13 @@ public:
 		std::vector<std::string> eliminated_cards;
 	};
 
-	void set_number_of_players(unsigned int number);
-	unsigned int get_number_of_players();
+	void set_number_of_players(int number);
+	int get_number_of_players();
 	void set_player_name(const std::string& name, int turn_order);
 	std::string get_player_name(int turn_order);
-	void record_turn(int round, int asking_player_turn_order, const std::string& suspect, const std::string& room, const std::string& weapon, int answering_player_turn_order);
+	int get_player_turn_order(const std::string& name);
+	void record_turn(turn turn_data);
+	bool turn_recorded(int round, int asking_player_turn_order);
 	turn get_turn(int round, int asking_player_turn_order);
 	void set_one_of_each_murder_element(bool one_of_each);
 	bool get_one_of_each_murder_element();
@@ -60,7 +62,7 @@ private:
 		int turn_order = -1;
 	};
 
-	unsigned int number_of_players = 0;
+	int number_of_players = 0;
 	bool one_of_each_murder_element = true;
 	std::string game_name = "";
 

@@ -2,12 +2,12 @@
 #include <ascii_engine/file_manager.h>
 #include <ascii_engine/error_codes.h>
 
-void data::set_number_of_players(unsigned int number)
+void data::set_number_of_players(int number)
 {
 	players.clear();
 	number_of_players = number;
 
-	for (unsigned int i = 0; i < number_of_players; i++)
+	for (int i = 0; i < number_of_players; i++)
 	{
 		player_name_turn_order_container new_player;
 		new_player.turn_order = i;
@@ -15,7 +15,7 @@ void data::set_number_of_players(unsigned int number)
 	}
 }
 
-unsigned int data::get_number_of_players()
+int data::get_number_of_players()
 {
 	return number_of_players;
 }
@@ -47,16 +47,39 @@ std::string data::get_player_name(int turn_order)
 	return name;
 }
 
-void data::record_turn(int round, int asking_player_turn_order, const std::string& suspect, const std::string& room, const std::string& weapon, int answering_player_turn_order)
+int data::get_player_turn_order(const std::string& name)
 {
-	turn player_turn;
-	player_turn.round = round;
-	player_turn.asking_player_turn_order = asking_player_turn_order;
-	player_turn.suspect = suspect;
-	player_turn.room = room;
-	player_turn.weapon = weapon;
-	player_turn.answering_player_turn_order = answering_player_turn_order;
-	turn_history.push_back(player_turn);
+	int turn_order = -1;
+	for (unsigned int i = 0; i < players.size(); i++)
+	{
+		if (players[i].name == name)
+		{
+			turn_order = players[i].turn_order;
+			break;
+		}
+	}
+
+	return turn_order;
+}
+
+void data::record_turn(turn turn_data)
+{
+	turn_history.push_back(turn_data);
+}
+
+bool data::turn_recorded(int round, int asking_player_turn_order)
+{
+	bool recorded = false;
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			recorded = true;
+			break;
+		}
+	}
+
+	return recorded;
 }
 
 data::turn data::get_turn(int round, int asking_player_turn_order)

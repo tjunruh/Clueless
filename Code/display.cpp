@@ -24,6 +24,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	weapon_label(turn_entry_display),
 	weapon_menu(turn_entry_display, "merge"),
 	answering_player_label(turn_entry_display, "new line"),
+	answering_player_menu(turn_entry_display, "new line"),
 	known_card_label(turn_entry_display, "new line"),
 	back_label(turn_entry_display, "new line"),
 	forward_label(turn_entry_display),
@@ -114,24 +115,27 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 
 	round_label.set_output("Round: ");
 	round_label.set_alignment("center");
+	round_label.add_border(true);
 	round_label.use_spacing_width_multipliers(true);
 	round_label.set_width_multiplier(3.0f);
 	round_label.set_spacing_width_multipliers(3.0f, 3.0f);
-	round_label.set_spacing(6, 3, 0, 0);
+	round_label.set_spacing(1, 2, 0, 0);
 
 	asking_player_label.set_output("Asking Player: ");
 	asking_player_label.set_alignment("center");
+	asking_player_label.add_border(true);
 	asking_player_label.use_spacing_width_multipliers(true);
 	asking_player_label.set_width_multiplier(3.0f);
 	asking_player_label.set_spacing_width_multipliers(3.0f, 3.0f);
-	asking_player_label.set_spacing(0, 3, 0, 0);
+	asking_player_label.set_spacing(0, 2, 0, 0);
 
 	suspect_label.set_output("Suspect");
 	suspect_label.set_alignment("center");
 	suspect_label.use_spacing_width_multipliers(true);
 	suspect_label.set_width_multiplier(2.33f);
 	suspect_label.set_spacing_width_multipliers(0.5f, 0.25f);
-	
+
+	suspect_menu.append_item("None");
 	suspect_menu.append_item("Colonel Mustard");
 	suspect_menu.append_item("Professor Plum");
 	suspect_menu.append_item("Mr. Green");
@@ -142,7 +146,8 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	suspect_menu.use_spacing_width_multipliers(true);
 	suspect_menu.set_width_multiplier(2.33f);
 	suspect_menu.set_spacing_width_multipliers(0.5f, 0.25f);
-	suspect_menu.set_spacing(0, 3, 0, 0);
+	suspect_menu.set_spacing(0, 2, 0, 0);
+	suspect_menu.enable_quit(true);
 	suspect_menu.build();
 
 	room_label.set_output("Room");
@@ -151,6 +156,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	room_label.set_width_multiplier(2.33f);
 	room_label.set_spacing_width_multipliers(0.25f, 0.25f);
 
+	room_menu.append_item("None");
 	room_menu.append_item("Hall");
 	room_menu.append_item("Lounge");
 	room_menu.append_item("Dining Room");
@@ -164,7 +170,8 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	room_menu.use_spacing_width_multipliers(true);
 	room_menu.set_width_multiplier(2.33f);
 	room_menu.set_spacing_width_multipliers(0.25f, 0.25f);
-	room_menu.set_spacing(0, 3, 0, 0);
+	room_menu.set_spacing(0, 2, 0, 0);
+	room_menu.enable_quit(true);
 	room_menu.build();
 
 	weapon_label.set_output("Weapon");
@@ -173,6 +180,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	weapon_label.set_width_multiplier(2.33f);
 	weapon_label.set_spacing_width_multipliers(0.25f, 0.5f);
 
+	weapon_menu.append_item("None");
 	weapon_menu.append_item("Knife");
 	weapon_menu.append_item("Candlestick");
 	weapon_menu.append_item("Revolver");
@@ -183,8 +191,51 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	weapon_menu.use_spacing_width_multipliers(true);
 	weapon_menu.set_width_multiplier(2.33f);
 	weapon_menu.set_spacing_width_multipliers(0.25f, 0.5f);
-	weapon_menu.set_spacing(0, 3, 0, 0);
+	weapon_menu.set_spacing(0, 2, 0, 0);
+	weapon_menu.enable_quit(true);
 	weapon_menu.build();
+
+	answering_player_label.set_output("Answering Player");
+	answering_player_label.set_alignment("center");
+	answering_player_label.add_border(true);
+	answering_player_label.use_spacing_width_multipliers(true);
+	answering_player_label.set_width_multiplier(3.0f);
+	answering_player_label.set_spacing_width_multipliers(3.0f, 3.0f);
+
+	answering_player_menu.append_item("None");
+	answering_player_menu.add_border(true);
+	answering_player_menu.use_spacing_width_multipliers(true);
+	answering_player_menu.set_width_multiplier(3.0f);
+	answering_player_menu.set_spacing_width_multipliers(3.0f, 3.0f);
+	answering_player_menu.set_spacing(0, 2, 0, 0);
+	answering_player_menu.enable_quit(true);
+	answering_player_menu.build();
+
+	known_card_label.set_output("Known Card: ");
+	known_card_label.set_alignment("center");
+	known_card_label.add_border(true);
+	known_card_label.use_spacing_width_multipliers(true);
+	known_card_label.set_width_multiplier(3.0f);
+	known_card_label.set_spacing_width_multipliers(3.0f, 3.0f);
+	known_card_label.set_spacing(0, 2, 0, 0);
+
+	back_label.set_output("<-- Back");
+	back_label.set_alignment("center");
+	back_label.add_border(true);
+	back_label.use_spacing_width_multipliers(true);
+	back_label.set_width_multiplier(2.0f);
+	back_label.set_spacing_width_multipliers(0.5f, 2.0f);
+	back_label.set_spacing(4, 0, 0, 0);
+	back_label.set_selectable(true);
+
+	forward_label.set_output("Forward -->");
+	forward_label.set_alignment("center");
+	forward_label.add_border(true);
+	forward_label.use_spacing_width_multipliers(true);
+	forward_label.set_width_multiplier(2.0f);
+	forward_label.set_spacing_width_multipliers(2.0f, 0.5f);
+	forward_label.set_spacing(4, 0, 0, 0);
+	forward_label.set_selectable(true);
 
 	report_frame = report_display;
 
@@ -398,6 +449,13 @@ bool display::display_setup(data& database)
 		database.set_player_name(player_4_name, 3);
 		database.set_player_name(player_5_name, 4);
 		database.set_player_name(player_6_name, 5);
+		answering_player_menu.remove_all_items();
+		answering_player_menu.append_item("None");
+		for (int i = 0; i < number_of_players; i++)
+		{
+			answering_player_menu.append_item(database.get_player_name(i));
+		}
+		answering_player_menu.build();
 	}
 
 	number_of_players_text_box.clear();
@@ -409,6 +467,125 @@ bool display::display_setup(data& database)
 	player_6_name_text_box.clear();
 
 	return setup_completed;
+}
+
+display::turn_entry_feedback display::display_turn_entry(data& database, int round, int asking_player_turn_order)
+{
+	turn_entry_feedback feedback = forward;
+	round_label.set_output("Round: " + std::to_string(round));
+	asking_player_label.set_output("Asking Player: " + database.get_player_name(asking_player_turn_order));
+	if (database.turn_recorded(round, asking_player_turn_order))
+	{
+		data::turn turn_data = database.get_turn(round, asking_player_turn_order);
+		suspect_menu.start_logging("menu.log");
+		set_suspect_menu_selection(turn_data.suspect);
+		set_room_menu_selection(turn_data.room);
+		set_weapon_menu_selection(turn_data.weapon);
+		set_answering_player_menu_selection(database.get_player_name(turn_data.answering_player_turn_order));
+		known_card_label.set_output("Known Card: " + turn_data.known_card);
+		suspect_menu.stop_logging();
+
+		int selection = ascii_io::undefined;
+
+		do
+		{
+			selection = turn_entry_frame->get_selection();
+			if (selection == back_label)
+			{
+				feedback = backward;
+				break;
+			}
+			else if (selection == forward_label)
+			{
+				feedback = forward;
+				break;
+			}
+
+		} while(true);
+	}
+	else
+	{
+		suspect_menu.set_cursor_index(0);
+		room_menu.set_cursor_index(0);
+		weapon_menu.set_cursor_index(0);
+		answering_player_menu.set_cursor_index(0);
+
+		int selection = ascii_io::undefined;
+		std::string suspect = "None";
+		std::string room = "None";
+		std::string weapon = "None";
+		std::string answering_player_name = "None";
+
+		do
+		{
+			selection = turn_entry_frame->get_selection();
+
+			if (selection == suspect_menu)
+			{
+				int key_stroke = ascii_io::undefined;
+				suspect_menu.get_selection(suspect, key_stroke);
+				if (key_stroke != ascii_io::enter)
+				{
+					suspect = "None";
+					suspect_menu.set_cursor_index(0);
+				}
+			}
+			else if (selection == room_menu)
+			{
+				int key_stroke = ascii_io::undefined;
+				room_menu.get_selection(room, key_stroke);
+				if (key_stroke != ascii_io::enter)
+				{
+					room = "None";
+					room_menu.set_cursor_index(0);
+				}
+			}
+			else if (selection == weapon_menu)
+			{
+				int key_stroke = ascii_io::undefined;
+				weapon_menu.get_selection(weapon, key_stroke);
+				if (key_stroke != ascii_io::enter)
+				{
+					weapon = "None";
+					weapon_menu.set_cursor_index(0);
+				}
+			}
+			else if (selection == answering_player_menu)
+			{
+				int key_stroke = ascii_io::undefined;
+				answering_player_menu.get_selection(answering_player_name, key_stroke);
+				if (key_stroke != ascii_io::enter)
+				{
+					answering_player_name = "None";
+					answering_player_menu.set_cursor_index(0);
+				}
+			}
+			else if (selection == back_label)
+			{
+				feedback = backward;
+				break;
+			}
+			else if (selection == forward_label)
+			{
+				if (suspect != "None" && room != "None" && weapon != "None" && answering_player_name != "None")
+				{
+					feedback = forward;
+					data::turn turn_data;
+					turn_data.round = round;
+					turn_data.asking_player_turn_order = asking_player_turn_order;
+					turn_data.suspect = suspect;
+					turn_data.room = room;
+					turn_data.weapon = weapon;
+					turn_data.answering_player_turn_order = database.get_player_turn_order(answering_player_name);
+					database.record_turn(turn_data);
+					break;
+				}
+			}
+
+		} while(true);
+	}
+
+	return feedback;
 }
 
 void display::render_name_text_boxes(int number_of_players)
@@ -500,4 +677,56 @@ bool display::is_number(const std::string& number_string)
 	}
 
 	return number;
+}
+
+void display::set_suspect_menu_selection(const std::string& suspect)
+{
+	std::vector<menu::item_structure> suspects = suspect_menu.get_menu_item_data();
+	for (unsigned int i = 0; i < suspects.size(); i++)
+	{
+		if (suspects[i].item == suspect)
+		{
+			suspect_menu.set_cursor_index(i);
+			break;
+		}
+	}
+}
+
+void display::set_room_menu_selection(const std::string& room)
+{
+	std::vector<menu::item_structure> rooms = room_menu.get_menu_item_data();
+	for (unsigned int i = 0; i < rooms.size(); i++)
+	{
+		if (rooms[i].item == room)
+		{
+			room_menu.set_cursor_index(i);
+			break;
+		}
+	}
+}
+
+void display::set_weapon_menu_selection(const std::string& weapon)
+{
+	std::vector<menu::item_structure> weapons = weapon_menu.get_menu_item_data();
+	for (unsigned int i = 0; i < weapons.size(); i++)
+	{
+		if (weapons[i].item == weapon)
+		{
+			weapon_menu.set_cursor_index(i);
+			break;
+		}
+	}
+}
+
+void display::set_answering_player_menu_selection(const std::string& name)
+{
+	std::vector<menu::item_structure> names = answering_player_menu.get_menu_item_data();
+	for (unsigned int i = 0; i < names.size(); i++)
+	{
+		if (names[i].item == name)
+		{
+			answering_player_menu.set_cursor_index(i);
+			break;
+		}
+	}
 }

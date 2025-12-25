@@ -12,10 +12,25 @@ class display
 public:
 	display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display);
 
+	enum turn_entry_feedback
+	{
+		none,
+		forward,
+		backward,
+		overview,
+		save,
+		settings
+	};
+
 	bool display_setup(data& database);
+	turn_entry_feedback display_turn_entry(data& database, int round, int asking_player_turn_order);
 private:
 	void render_name_text_boxes(int number_of_players);
 	bool is_number(const std::string& number_string);
+	void set_suspect_menu_selection(const std::string& suspect);
+	void set_room_menu_selection(const std::string& room);
+	void set_weapon_menu_selection(const std::string& weapon);
+	void set_answering_player_menu_selection(const std::string& name);
 
 	label number_of_players_label;
 	text_box number_of_players_text_box;
@@ -40,6 +55,7 @@ private:
 	label weapon_label;
 	menu weapon_menu;
 	label answering_player_label;
+	menu answering_player_menu;
 	label known_card_label;
 	label back_label;
 	label forward_label;
