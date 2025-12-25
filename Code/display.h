@@ -31,6 +31,7 @@ private:
 	void set_room_menu_selection(const std::string& room);
 	void set_weapon_menu_selection(const std::string& weapon);
 	void set_answering_player_menu_selection(const std::string& name);
+	bool name_present(const std::string& name, const std::vector<std::string>& names);
 
 	label number_of_players_label;
 	text_box number_of_players_text_box;

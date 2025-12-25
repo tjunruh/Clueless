@@ -335,6 +335,11 @@ bool display::display_setup(data& database)
 			if (exit_code == ascii_io::enter)
 			{
 				player_name = your_name_text_box.get_text();
+				if (name_present(player_name, {player_2_name, player_3_name, player_4_name, player_5_name, player_6_name}))
+				{
+					player_name = "";
+					your_name_text_box.clear();
+				}
 			}
 			else
 			{
@@ -348,6 +353,11 @@ bool display::display_setup(data& database)
 			if (exit_code == ascii_io::enter)
 			{
 				player_2_name = player_2_name_text_box.get_text();
+				if (name_present(player_2_name, {player_name, player_3_name, player_4_name, player_5_name, player_6_name}))
+				{
+					player_2_name = "";
+					player_2_name_text_box.clear();
+				}
 			}
 			else
 			{
@@ -361,6 +371,11 @@ bool display::display_setup(data& database)
 			if (exit_code == ascii_io::enter)
 			{
 				player_3_name = player_3_name_text_box.get_text();
+				if (name_present(player_3_name, {player_2_name, player_name, player_4_name, player_5_name, player_6_name}))
+				{
+					player_3_name = "";
+					player_3_name_text_box.clear();
+				}
 			}
 			else
 			{
@@ -374,6 +389,11 @@ bool display::display_setup(data& database)
 			if (exit_code == ascii_io::enter)
 			{
 				player_4_name = player_4_name_text_box.get_text();
+				if (name_present(player_4_name, {player_2_name, player_3_name, player_name, player_5_name, player_6_name}))
+				{
+					player_4_name = "";
+					player_4_name_text_box.clear();
+				}
 			}
 			else
 			{
@@ -387,6 +407,11 @@ bool display::display_setup(data& database)
 			if (exit_code == ascii_io::enter)
 			{
 				player_5_name = player_5_name_text_box.get_text();
+				if (name_present(player_5_name, {player_2_name, player_3_name, player_4_name, player_name, player_6_name}))
+				{
+					player_5_name = "";
+					player_5_name_text_box.clear();
+				}
 			}
 			else
 			{
@@ -400,6 +425,11 @@ bool display::display_setup(data& database)
 			if (exit_code == ascii_io::enter)
 			{
 				player_6_name = player_6_name_text_box.get_text();
+				if (name_present(player_6_name, {player_2_name, player_3_name, player_4_name, player_5_name, player_name}))
+				{
+					player_6_name = "";
+					player_6_name_text_box.clear();
+				}
 			}
 			else
 			{
@@ -831,4 +861,19 @@ void display::set_answering_player_menu_selection(const std::string& name)
 			break;
 		}
 	}
+}
+
+bool display::name_present(const std::string& name, const std::vector<std::string>& names)
+{
+	bool present = false;
+	for (unsigned int i = 0; i < names.size(); i++)
+	{
+		if (name == names[i])
+		{
+			present = true;
+			break;
+		}
+	}
+
+	return present;
 }
