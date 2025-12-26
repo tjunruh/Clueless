@@ -29,7 +29,11 @@ public:
 	FRAME_API void set_controls(int select, int quit, int up, int down, int left, int right);
 	FRAME_API void set_controls(controls* centralized_controls);
 	FRAME_API void get_controls(int& select, int& quit, int& up, int& down, int& left, int& right);
+	FRAME_API void set_selection_exit_keys(const std::vector<int>& exit_keys);
+	FRAME_API std::vector<int> get_selection_exit_keys();
+	FRAME_API void set_selection(int selection);
 	FRAME_API int get_selection();
+	FRAME_API bool selection_exit_key_used();
 	FRAME_API void enable_dec(bool enable);
 	FRAME_API void use_light_dec_formatting(bool light_formatting);
 	FRAME_API bool dec_enabled();
@@ -55,6 +59,7 @@ private:
 	{
 		int id = -1;
 		std::string output = "";
+		std::string title = "";
 		int row = 0;
 		int column = 0;
 		std::string alignment = "left";
@@ -144,6 +149,7 @@ private:
 	void bound_top_line(widget_info* item);
 	void dynamically_adjust_displayed_lines(widget_info* item);
 	std::vector<format_tools::index_format> dec_format(std::string& format_content, unsigned int line_length=0);
+	void add_title(const std::string& title, std::vector<std::string>& lines, int top_spacing, int left_spacing, int right_spacing);
 
 #ifdef __linux__
 	void dec_print(const std::string& input);
@@ -180,5 +186,8 @@ private:
 	int last_selected_column = 0;
 	int selected_level = 0;
 	int last_selected_level = 0;
+	int selected_id = -1;
 	controls* _centralized_controls = nullptr;
+	std::vector<int> selection_exit_keys = {};
+	bool exit_key_used;
 };
