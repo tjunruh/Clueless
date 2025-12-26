@@ -318,6 +318,7 @@ bool display::display_setup(data& database)
 					else
 					{
 						render_name_text_boxes(number_of_players);
+						initialization_frame->set_selection(your_name_text_box);
 					}
 				}
 				else
@@ -340,6 +341,10 @@ bool display::display_setup(data& database)
 					player_name = "";
 					your_name_text_box.clear();
 				}
+				else
+				{
+					initialization_frame->set_selection(player_2_name_text_box);
+				}
 			}
 			else
 			{
@@ -357,6 +362,10 @@ bool display::display_setup(data& database)
 				{
 					player_2_name = "";
 					player_2_name_text_box.clear();
+				}
+				else
+				{
+					initialization_frame->set_selection(player_3_name_text_box);
 				}
 			}
 			else
@@ -376,6 +385,10 @@ bool display::display_setup(data& database)
 					player_3_name = "";
 					player_3_name_text_box.clear();
 				}
+				else
+				{
+					initialization_frame->set_selection(player_4_name_text_box);
+				}
 			}
 			else
 			{
@@ -393,6 +406,10 @@ bool display::display_setup(data& database)
 				{
 					player_4_name = "";
 					player_4_name_text_box.clear();
+				}
+				else
+				{
+					initialization_frame->set_selection(player_5_name_text_box);
 				}
 			}
 			else
@@ -412,6 +429,10 @@ bool display::display_setup(data& database)
 					player_5_name = "";
 					player_5_name_text_box.clear();
 				}
+				else
+				{
+					initialization_frame->set_selection(player_6_name_text_box);
+				}
 			}
 			else
 			{
@@ -429,6 +450,10 @@ bool display::display_setup(data& database)
 				{
 					player_6_name = "";
 					player_6_name_text_box.clear();
+				}
+				else
+				{
+					initialization_frame->set_selection(ok_label);
 				}
 			}
 			else
@@ -631,6 +656,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 		weapon_menu.set_cursor_index(0);
 		answering_player_menu.set_cursor_index(0);
 		lock_unlock_label.set_output("lock");
+		turn_entry_frame->set_selection(suspect_menu);
 
 		int selection = ascii_io::undefined;
 
@@ -681,6 +707,10 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 						suspect = "None";
 						suspect_menu.set_cursor_index(0);
 					}
+					else
+					{
+						turn_entry_frame->set_selection(room_menu);
+					}
 				}
 				else if (selection == room_menu)
 				{
@@ -690,6 +720,10 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 					{
 						room = "None";
 						room_menu.set_cursor_index(0);
+					}
+					else
+					{
+						turn_entry_frame->set_selection(weapon_menu);
 					}
 				}
 				else if (selection == weapon_menu)
@@ -701,6 +735,10 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 						weapon = "None";
 						weapon_menu.set_cursor_index(0);
 					}
+					else
+					{
+						turn_entry_frame->set_selection(answering_player_menu);
+					}
 				}
 				else if (selection == answering_player_menu)
 				{
@@ -710,6 +748,10 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 					{
 						answering_player_name = "None";
 						answering_player_menu.set_cursor_index(0);
+					}
+					else
+					{
+						turn_entry_frame->set_selection(forward_label);
 					}
 				}
 			}
