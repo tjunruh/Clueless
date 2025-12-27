@@ -119,6 +119,8 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 
 	turn_entry_frame = turn_entry_display;
 
+	turn_entry_frame->set_selection_exit_keys({ascii_io::o});
+
 	round_label.set_output("Round: ");
 	round_label.set_alignment("center");
 	round_label.add_border(true);
@@ -142,12 +144,12 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	suspect_label.set_spacing_width_multipliers(0.5f, 0.25f);
 
 	suspect_menu.append_item("None");
-	suspect_menu.append_item("Colonel Mustard");
-	suspect_menu.append_item("Professor Plum");
-	suspect_menu.append_item("Mr. Green");
-	suspect_menu.append_item("Mrs. Peacock");
-	suspect_menu.append_item("Miss Scarlet");
-	suspect_menu.append_item("Mrs. White");
+	suspect_menu.append_item(cards::colonel_mustard);
+	suspect_menu.append_item(cards::professor_plum);
+	suspect_menu.append_item(cards::mr_green);
+	suspect_menu.append_item(cards::mrs_peacock);
+	suspect_menu.append_item(cards::miss_scarlett);
+	suspect_menu.append_item(cards::mrs_white);
 	suspect_menu.add_border(true);
 	suspect_menu.use_spacing_width_multipliers(true);
 	suspect_menu.set_width_multiplier(2.33f);
@@ -163,15 +165,15 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	room_label.set_spacing_width_multipliers(0.25f, 0.25f);
 
 	room_menu.append_item("None");
-	room_menu.append_item("Hall");
-	room_menu.append_item("Lounge");
-	room_menu.append_item("Dining Room");
-	room_menu.append_item("Kitchen");
-	room_menu.append_item("Ballroom");
-	room_menu.append_item("Conservatory");
-	room_menu.append_item("Billiard Room");
-	room_menu.append_item("Library");
-	room_menu.append_item("Study");
+	room_menu.append_item(cards::hall);
+	room_menu.append_item(cards::lounge);
+	room_menu.append_item(cards::dining_room);
+	room_menu.append_item(cards::kitchen);
+	room_menu.append_item(cards::ballroom);
+	room_menu.append_item(cards::conservatory);
+	room_menu.append_item(cards::billiard_room);
+	room_menu.append_item(cards::library);
+	room_menu.append_item(cards::study);
 	room_menu.add_border(true);
 	room_menu.use_spacing_width_multipliers(true);
 	room_menu.set_width_multiplier(2.33f);
@@ -187,12 +189,12 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	weapon_label.set_spacing_width_multipliers(0.25f, 0.5f);
 
 	weapon_menu.append_item("None");
-	weapon_menu.append_item("Knife");
-	weapon_menu.append_item("Candlestick");
-	weapon_menu.append_item("Revolver");
-	weapon_menu.append_item("Rope");
-	weapon_menu.append_item("Lead Pipe");
-	weapon_menu.append_item("Wrench");
+	weapon_menu.append_item(cards::knife);
+	weapon_menu.append_item(cards::candlestick);
+	weapon_menu.append_item(cards::revolver);
+	weapon_menu.append_item(cards::rope);
+	weapon_menu.append_item(cards::lead_pipe);
+	weapon_menu.append_item(cards::wrench);
 	weapon_menu.add_border(true);
 	weapon_menu.use_spacing_width_multipliers(true);
 	weapon_menu.set_width_multiplier(2.33f);
@@ -259,6 +261,10 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	report_board.set_spacing_width_multipliers(1.0f, 0.5f);
 	report_board.set_spacing(6, 6, 0, 0);
 	report_board.set_lines_count(-12);
+
+	report_board.add_configuration("has", -1, -1, "   V   ", '*');
+	report_board.add_configuration("hasn't", -1, -1, "   X   ", '*');
+	report_board.build();
 
 	investigation_suggestions_label.add_border(true);
 	investigation_suggestions_label.use_spacing_width_multipliers(true);
@@ -523,7 +529,9 @@ bool display::display_setup(data& database)
 		answering_player_menu.append_item("None");
 		for (int i = 0; i < number_of_players; i++)
 		{
-			answering_player_menu.append_item(database.get_player_name(i));
+			std::string player_name = database.get_player_name(i);
+			answering_player_menu.append_item(player_name);
+			report_board.set_tile(0, i, player_name);
 		}
 		answering_player_menu.build();
 	}
@@ -586,6 +594,12 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 				{
 					lock_unlock_label.set_output("lock");
 				}
+			}
+			else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::o)
+			{
+				display_overview(database.investigate());
+				ascii_io::zoom_to_level(0, 300);
+				turn_entry_frame->display();
 			}
 			else if (lock_unlock_label.get_output() == "lock")
 			{
@@ -696,6 +710,12 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 					break;
 				}
 			}
+			else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::o)
+			{
+				display_overview(database.investigate());
+				ascii_io::zoom_to_level(0, 300);
+				turn_entry_frame->display();
+			}
 			else if (lock_unlock_label.get_output() == "lock")
 			{
 				if (selection == suspect_menu)
@@ -760,6 +780,30 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 	}
 
 	return feedback;
+}
+
+void display::display_overview(const std::vector<data::player_cards>& known_cards)
+{
+	ascii_io::zoom_to_level(-3, 300);
+	for (unsigned int i = 0; i < known_cards.size(); i++)
+	{
+		for (unsigned int j = 0; j < known_cards[i].cards.size(); j++)
+		{
+			row_column coordinate = get_board_report_coordinate(known_cards[i].turn_order, known_cards[i].cards[j]);
+			report_board.activate_configuration("has", coordinate.row, coordinate.column);
+		}
+
+		for (unsigned int j = 0; j < known_cards[i].eliminated_cards.size(); j++)
+		{
+			row_column coordinate = get_board_report_coordinate(known_cards[i].turn_order, known_cards[i].eliminated_cards[j]);
+			report_board.activate_configuration("hasn't", coordinate.row, coordinate.column);
+		}
+	}
+
+	report_board.build();
+
+	report_frame->display();
+	ascii_io::wait_for_keystroke({ascii_io::enter});
 }
 
 void display::render_name_text_boxes(int number_of_players)
@@ -918,4 +962,19 @@ bool display::name_present(const std::string& name, const std::vector<std::strin
 	}
 
 	return present;
+}
+
+display::row_column display::get_board_report_coordinate(int player_turn_order, const std::string& card)
+{
+	row_column coordinate;
+	for (unsigned int i = 0; i < report_board_coordinate_map.size(); i++)
+	{
+		if (report_board_coordinate_map[i].player_turn_order == player_turn_order && report_board_coordinate_map[i].card_name == card)
+		{
+			coordinate = report_board_coordinate_map[i].coordinate;
+			break;
+		}
+	}
+
+	return coordinate;
 }

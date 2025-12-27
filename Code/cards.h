@@ -11,7 +11,7 @@ namespace cards
 	const std::string professor_plum = "Professor Plum";
 
 	const std::string candlestick = "Candlestick";
-	const std::string dagger = "Dagger";
+	const std::string knife = "Knife";
 	const std::string lead_pipe = "Lead Pipe";
 	const std::string revolver = "Revolver";
 	const std::string rope = "Rope";
@@ -40,7 +40,7 @@ namespace cards
 	const std::vector<std::string> weapons =
 	{
 		candlestick,
-		dagger,
+		knife,
 		lead_pipe,
 		revolver,
 		rope,
