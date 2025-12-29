@@ -47,6 +47,33 @@ std::string data::get_player_name(int turn_order)
 	return name;
 }
 
+void data::set_player_out(bool out, int turn_order)
+{
+	for (unsigned int i = 0; i < players.size(); i++)
+	{
+		if (players[i].turn_order == turn_order)
+		{
+			players[i].out = out;
+			break;
+		}
+	}
+}
+
+bool data::get_player_out(int turn_order)
+{
+	bool out = true;
+	for (unsigned int i = 0; i < players.size(); i++)
+	{
+		if (players[i].turn_order == turn_order)
+		{
+			out = players[i].out;
+			break;
+		}
+	}
+
+	return out;
+}
+
 int data::get_player_turn_order(const std::string& name)
 {
 	int turn_order = -1;
@@ -98,6 +125,18 @@ void data::reset_weapon(int round, int asking_player_turn_order, const std::stri
 		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
 		{
 			turn_history[i].weapon = weapon;
+			break;
+		}
+	}
+}
+
+void data::reset_known_card(int round, int asking_player_turn_order, const std::string& known_card)
+{
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			turn_history[i].known_card = known_card;
 			break;
 		}
 	}
@@ -188,6 +227,21 @@ std::string data::get_weapon(int round, int asking_player_turn_order)
 	}
 
 	return weapon;
+}
+
+std::string data::get_known_card(int round, int asking_player_turn_order)
+{
+	std::string known_card = "";
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
+		{
+			known_card = turn_history[i].known_card;
+			break;
+		}
+	}
+
+	return known_card;
 }
 
 int data::get_answering_player_turn_order(int round, int asking_player_turn_order)

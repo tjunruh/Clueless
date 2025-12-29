@@ -194,9 +194,11 @@ private:
 	void set_suspect_menu_selection(const std::string& suspect);
 	void set_room_menu_selection(const std::string& room);
 	void set_weapon_menu_selection(const std::string& weapon);
+	void set_known_card_menu_selection(const std::string& card_name);
 	void set_answering_player_menu_selection(const std::string& name);
 	bool name_present(const std::string& name, const std::vector<std::string>& names);
 	row_column get_board_report_coordinate(int player_turn_order, const std::string& card);
+	void reset_known_card_menu(data& database, int round, int player_turn_order, std::string& known_card);
 
 	label number_of_players_label;
 	text_box number_of_players_text_box;
@@ -222,7 +224,7 @@ private:
 	menu weapon_menu;
 	label answering_player_label;
 	menu answering_player_menu;
-	label known_card_label;
+	menu known_card_menu;
 	label back_label;
 	label lock_unlock_label;
 	label forward_label;
