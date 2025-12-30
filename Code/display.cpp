@@ -607,9 +607,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 	answering_player_menu.append_item("None");
 	for (int i = 0; i < database.get_number_of_players(); i++)
 	{
-		std::string player_name = database.get_player_name(i);
-		answering_player_menu.append_item(player_name);
-		report_board.set_tile(0, i, player_name);
+		answering_player_menu.append_item(database.get_player_name(i));
 	}
 	answering_player_menu.build();
 
@@ -661,7 +659,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 			}
 			else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::o)
 			{
-				display_overview(database.investigate());
+				display_overview(database.investigate(), database);
 				ascii_io::zoom_to_level(0, 300);
 				turn_entry_frame->display();
 			}
@@ -806,7 +804,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 			}
 			else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::o)
 			{
-				display_overview(database.investigate());
+				display_overview(database.investigate(), database);
 				ascii_io::zoom_to_level(0, 300);
 				turn_entry_frame->display();
 			}
@@ -926,10 +924,16 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 	return feedback;
 }
 
-void display::display_overview(const std::vector<data::player_cards>& known_cards)
+void display::display_overview(const std::vector<data::player_cards>& known_cards, data& database)
 {
 	ascii_io::zoom_to_level(-2, 500);
 	report_board.clear_all();
+
+	for (int i = 0; i < database.get_number_of_players(); i++)
+	{
+		report_board.set_tile(0, i, database.get_player_name(i));
+	}
+
 	for (unsigned int i = 0; i < known_cards.size(); i++)
 	{
 		for (unsigned int j = 0; j < known_cards[i].cards.size(); j++)

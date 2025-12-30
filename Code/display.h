@@ -26,7 +26,7 @@ public:
 
 	bool display_setup(data& database);
 	turn_entry_feedback display_turn_entry(data& database, int round, int asking_player_turn_order);
-	void display_overview(const std::vector<data::player_cards>& known_cards);
+	void display_overview(const std::vector<data::player_cards>& known_cards, data& databse);
 	bool display_save(data& database);
 	bool display_load(data& database);
 private:
