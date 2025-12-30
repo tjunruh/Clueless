@@ -2,7 +2,7 @@
 #include "archive.h"
 #include <ascii_engine/ascii_io.h>
 
-display::display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display, frame* save_display, frame* load_display) :
+display::display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display, frame* save_display, frame* load_display, frame* own_cards_entry_display) :
 	number_of_players_label(initialization_display),
 	number_of_players_text_box(initialization_display, "merge"),
 	your_name_label(initialization_display, "merge"),
@@ -40,7 +40,10 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 
 	save_text_box(save_display),
 
-	load_menu(load_display)
+	load_menu(load_display),
+
+	own_cards_entry_menu(own_cards_entry_display),
+	own_cards_entered_menu(own_cards_entry_display)
 {
 	initialization_frame = initialization_display;
 	number_of_players_label.set_output("Enter Number of Players (2-6)");
@@ -124,7 +127,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 
 	turn_entry_frame = turn_entry_display;
 
-	turn_entry_frame->set_selection_exit_keys({ascii_io::o, ascii_io::s});
+	turn_entry_frame->set_selection_exit_keys({ascii_io::o, ascii_io::s, ascii_io::e});
 
 	round_label.set_output("Round: ");
 	round_label.set_alignment("center");
@@ -312,6 +315,50 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	load_menu.set_title("Select Game to Load");
 	load_menu.enable_quit(true);
 	load_menu.set_controls({ascii_io::enter, ascii_io::DEL}, ascii_io::up, ascii_io::down, ascii_io::left, ascii_io::right, ascii_io::q);
+
+	own_cards_entry_frame = own_cards_entry_display;
+
+	own_cards_entry_menu.append_item(cards::colonel_mustard);
+	own_cards_entry_menu.append_item(cards::professor_plum);
+	own_cards_entry_menu.append_item(cards::mr_green);
+	own_cards_entry_menu.append_item(cards::mrs_peacock);
+	own_cards_entry_menu.append_item(cards::miss_scarlett);
+	own_cards_entry_menu.append_item(cards::mrs_white);
+	own_cards_entry_menu.append_item(cards::hall);
+	own_cards_entry_menu.append_item(cards::lounge);
+	own_cards_entry_menu.append_item(cards::dining_room);
+	own_cards_entry_menu.append_item(cards::kitchen);
+	own_cards_entry_menu.append_item(cards::ballroom);
+	own_cards_entry_menu.append_item(cards::conservatory);
+	own_cards_entry_menu.append_item(cards::billiard_room);
+	own_cards_entry_menu.append_item(cards::library);
+	own_cards_entry_menu.append_item(cards::study);
+	own_cards_entry_menu.append_item(cards::knife);
+	own_cards_entry_menu.append_item(cards::candlestick);
+	own_cards_entry_menu.append_item(cards::revolver);
+	own_cards_entry_menu.append_item(cards::rope);
+	own_cards_entry_menu.append_item(cards::lead_pipe);
+	own_cards_entry_menu.append_item(cards::wrench);
+	own_cards_entry_menu.add_border(true);
+	own_cards_entry_menu.use_spacing_width_multipliers(true);
+	own_cards_entry_menu.set_width_multiplier(3.0f);
+	own_cards_entry_menu.set_spacing_width_multipliers(1.0f, 0.5f);
+	own_cards_entry_menu.set_spacing(2, 0, 0, 0);
+	own_cards_entry_menu.enable_quit(true);
+	own_cards_entry_menu.set_lines_count(-6);
+	own_cards_entry_menu.set_controls({ascii_io::enter, ascii_io::DEL}, ascii_io::up, ascii_io::down, ascii_io::left, ascii_io::right, ascii_io::q);
+	own_cards_entry_menu.set_title("Enter Cards in Your Hand");
+	own_cards_entry_menu.build();
+
+	own_cards_entered_menu.add_border(true);
+	own_cards_entered_menu.use_spacing_width_multipliers(true);
+	own_cards_entered_menu.set_width_multiplier(3.0f);
+	own_cards_entered_menu.set_spacing_width_multipliers(0.5f, 1.0f);
+	own_cards_entered_menu.set_spacing(2, 0, 0, 0);
+	own_cards_entered_menu.set_lines_count(-6);
+	own_cards_entered_menu.set_cursor(' ');
+	own_cards_entered_menu.set_title("Entered Cards");
+	own_cards_entered_menu.build();
 }
 
 bool display::display_setup(data& database)
@@ -668,6 +715,11 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 				feedback = save;
 				break;
 			}
+			else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::e)
+			{
+				feedback = entry;
+				break;
+			}
 			else if (lock_unlock_label.get_output() == "lock")
 			{
 				if (selection == suspect_menu)
@@ -811,6 +863,11 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 			else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::s)
 			{
 				feedback = save;
+				break;
+			}
+			else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::e)
+			{
+				feedback = entry;
 				break;
 			}
 			else if (lock_unlock_label.get_output() == "lock")
@@ -1039,6 +1096,49 @@ bool display::display_load(data& database)
 	} while (true);
 
 	return loaded;
+}
+
+void display::display_own_cards_entry(data& database)
+{
+	own_cards_entered_menu.remove_all_items();
+	std::vector<std::string> own_cards = database.get_own_cards();
+	for (unsigned int i = 0; i < own_cards.size(); i++)
+	{
+		own_cards_entered_menu.append_item(own_cards[i]);
+	}
+
+	own_cards_entered_menu.build();
+
+	do
+	{
+		std::string selection = "";
+		int key_stroke = ascii_io::undefined;
+		own_cards_entry_menu.get_selection(selection, key_stroke);
+		if (key_stroke == ascii_io::enter)
+		{
+			own_cards_entered_menu.append_item(selection);
+			own_cards_entered_menu.build();
+		}
+		else if (key_stroke == ascii_io::DEL)
+		{
+			own_cards_entered_menu.remove_item(selection);
+			own_cards_entered_menu.build();
+		}
+		else
+		{
+			break;
+		}
+
+	} while(true);
+
+	std::vector<menu::item_structure> entered_cards = own_cards_entered_menu.get_menu_item_data();
+	own_cards.clear();
+	for (unsigned int i = 0; i < entered_cards.size(); i++)
+	{
+		own_cards.push_back(entered_cards[i].item);
+	}
+
+	database.set_own_cards(own_cards);
 }
 
 void display::render_name_text_boxes(int number_of_players)

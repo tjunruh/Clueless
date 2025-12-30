@@ -45,6 +45,8 @@ public:
 	std::string get_room(int round, int asking_player_turn_order);
 	std::string get_weapon(int round, int asking_player_turn_order);
 	std::string get_known_card(int round, int asking_player_turn_order);
+	void set_own_cards(const std::vector<std::string>& cards);
+	std::vector<std::string> get_own_cards();
 	int get_answering_player_turn_order(int round, int asking_player_turn_order);
 	void set_one_of_each_murder_element(bool one_of_each);
 	bool get_one_of_each_murder_element();
@@ -82,6 +84,7 @@ private:
 
 	std::vector<player_name_turn_order_container> players;
 	std::vector<turn> turn_history;
+	std::vector<std::string> own_cards;
 
 	std::string guilty_suspect = "";
 	std::string murder_room = "";

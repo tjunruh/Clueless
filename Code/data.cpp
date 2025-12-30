@@ -244,6 +244,16 @@ std::string data::get_known_card(int round, int asking_player_turn_order)
 	return known_card;
 }
 
+void data::set_own_cards(const std::vector<std::string>& cards)
+{
+	own_cards = cards;
+}
+
+std::vector<std::string> data::get_own_cards()
+{
+	return own_cards;
+}
+
 int data::get_answering_player_turn_order(int round, int asking_player_turn_order)
 {
 	int answering_player_turn_order = -1;
@@ -289,6 +299,11 @@ std::vector<data::player_cards> data::investigate()
 		cards_data.name = players[i].name;
 		cards_data.turn_order = players[i].turn_order;
 		investigation_information.push_back(cards_data);
+	}
+
+	for (unsigned int i = 0; i < own_cards.size(); i++)
+	{
+		append_card(investigation_information, own_cards[i], 0);
 	}
 
 	eliminate_cards_based_on_turn_history(investigation_information);
@@ -597,6 +612,8 @@ int data::save(const std::string& path)
 		total_player_data.push_back(player_data);
 	}
 
+	game_data["own_cards"] = own_cards;
+
 	game_data["players"] = total_player_data;
 
 	int status = file_manager::write_file(path, game_data.dump(3));
@@ -648,6 +665,8 @@ int data::load(const std::string& path)
 				player.out = (*itr)["out"];
 				players.push_back(player);
 			}
+
+			own_cards = game_data["own_cards"];
 
 			status = SUCCESS;
 		}
@@ -707,6 +726,11 @@ bool data::loaded_data_valid(const nlohmann::json& game_data)
 	}
 
 	if (!game_data.contains("players") || !game_data["players"].is_array())
+	{
+		return false;
+	}
+
+	if (!game_data.contains("own_cards") || !game_data["own_cards"].is_array())
 	{
 		return false;
 	}

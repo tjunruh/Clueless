@@ -17,7 +17,8 @@ int main()
 	frame* control_frame = new frame();
 	frame* save_frame = new frame();
 	frame* load_frame = new frame();
-	display display_manager(initialization_frame, turn_entry_frame, report_frame, control_frame, save_frame, load_frame);
+	frame* own_cards_entry_frame = new frame();
+	display display_manager(initialization_frame, turn_entry_frame, report_frame, control_frame, save_frame, load_frame, own_cards_entry_frame);
 	data database;
 
 	std::string logo_content = "";
@@ -60,6 +61,10 @@ int main()
 			if (setup_game)
 			{
 				setup_complete = display_manager.display_setup(database);
+				if (setup_complete)
+				{
+					display_manager.display_own_cards_entry(database);
+				}
 			}
 
 			if (setup_complete)
@@ -91,6 +96,10 @@ int main()
 							turn = database.get_number_of_players() - 1;
 							round--;
 						}
+					}
+					else if (feedback == display::turn_entry_feedback::entry)
+					{
+						display_manager.display_own_cards_entry(database);
 					}
 					else if (feedback == display::turn_entry_feedback::save)
 					{
@@ -139,6 +148,7 @@ int main()
 	delete(control_frame);
 	delete(save_frame);
 	delete(load_frame);
+	delete(own_cards_entry_frame);
 	ascii_io::show_cursor();
 	ascii_io::ascii_engine_end();
 }
