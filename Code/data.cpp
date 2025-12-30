@@ -782,6 +782,20 @@ int data::get_current_round()
 		}
 	}
 
+	int number_of_turns_in_round = 0;
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round)
+		{
+			number_of_turns_in_round++;
+		}
+	}
+
+	if (number_of_turns_in_round == number_of_players)
+	{
+		round++;
+	}
+
 	return round;
 }
 
