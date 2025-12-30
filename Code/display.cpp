@@ -396,7 +396,14 @@ bool display::display_setup(data& database)
 				}
 				else
 				{
-					initialization_frame->set_selection(player_3_name_text_box);
+					if (number_of_players > 2)
+					{
+						initialization_frame->set_selection(player_3_name_text_box);
+					}
+					else
+					{
+						initialization_frame->set_selection(ok_label);
+					}
 				}
 			}
 			else
@@ -418,7 +425,14 @@ bool display::display_setup(data& database)
 				}
 				else
 				{
-					initialization_frame->set_selection(player_4_name_text_box);
+					if (number_of_players > 3)
+					{
+						initialization_frame->set_selection(player_4_name_text_box);
+					}
+					else
+					{
+						initialization_frame->set_selection(ok_label);
+					}
 				}
 			}
 			else
@@ -440,7 +454,14 @@ bool display::display_setup(data& database)
 				}
 				else
 				{
-					initialization_frame->set_selection(player_5_name_text_box);
+					if (number_of_players > 4)
+					{
+						initialization_frame->set_selection(player_5_name_text_box);
+					}
+					else
+					{
+						initialization_frame->set_selection(ok_label);
+					}
 				}
 			}
 			else
@@ -462,7 +483,14 @@ bool display::display_setup(data& database)
 				}
 				else
 				{
-					initialization_frame->set_selection(player_6_name_text_box);
+					if (number_of_players > 5)
+					{
+						initialization_frame->set_selection(player_6_name_text_box);
+					}
+					else
+					{
+						initialization_frame->set_selection(ok_label);
+					}
 				}
 			}
 			else
