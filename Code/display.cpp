@@ -311,6 +311,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	load_menu.set_spacing_width_multipliers(3.0f, 3.0f);
 	load_menu.set_title("Select Game to Load");
 	load_menu.enable_quit(true);
+	load_menu.set_controls({ascii_io::enter, ascii_io::DEL}, ascii_io::up, ascii_io::down, ascii_io::left, ascii_io::right, ascii_io::q);
 }
 
 bool display::display_setup(data& database)
@@ -925,9 +926,11 @@ void display::display_overview(const std::vector<data::player_cards>& known_card
 bool display::display_save(data& database)
 {
 	bool saved = false;
+	save_frame->display();
 	do
 	{
 		unsigned int exit_keystroke = save_text_box.write();
+		ascii_io::hide_cursor();
 		if (exit_keystroke == ascii_io::enter)
 		{
 			std::string game_name = save_text_box.get_text();
@@ -992,6 +995,7 @@ bool display::display_load(data& database)
 		{
 			archive::delete_game(selection);
 			std::vector<std::string> saved_games = archive::get_saved_game_names();
+			load_menu.remove_all_items();
 			for (unsigned int i = 0; i < saved_games.size(); i++)
 			{
 				load_menu.append_item(saved_games[i]);
