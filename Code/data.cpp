@@ -437,8 +437,11 @@ bool data::eliminate_cards_based_on_cards(std::vector<player_cards>& card_data)
 		{
 			for (unsigned int k = 0; k < card_data.size(); k++)
 			{
-				bool card_appended = append_card(card_data, card_data[i].cards[j],card_data[k].turn_order);
-				card_data_modified = card_data_modified || card_appended;
+				if (k != i)
+				{
+					bool card_appended = append_eliminated_card(card_data, card_data[i].cards[j],card_data[k].turn_order);
+					card_data_modified = card_data_modified || card_appended;
+				}
 			}
 		}
 	}
