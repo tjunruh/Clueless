@@ -1064,16 +1064,22 @@ bool display::display_load(data& database)
 		load_menu.get_selection(selection, key_stroke);
 		if (key_stroke == ascii_io::enter)
 		{
-			int status = archive::load_game(selection, database);
+			int status = UNDEFINED;
+			if (selection != "")
+			{
+				status = archive::load_game(selection, database);
+			}
+
 			if (status == SUCCESS)
 			{
 				loaded = true;
-				break;
 			}
 			else
 			{
 				loaded = false;
 			}
+
+			break;
 		}
 		else if (key_stroke == ascii_io::q)
 		{
