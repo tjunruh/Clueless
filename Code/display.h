@@ -11,7 +11,7 @@
 class display
 {
 public:
-	display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display);
+	display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display, frame* save_display, frame* load_display);
 
 	enum turn_entry_feedback
 	{
@@ -20,12 +20,15 @@ public:
 		backward,
 		overview,
 		save,
-		settings
+		settings,
+		exit
 	};
 
 	bool display_setup(data& database);
 	turn_entry_feedback display_turn_entry(data& database, int round, int asking_player_turn_order);
 	void display_overview(const std::vector<data::player_cards>& known_cards);
+	bool display_save(data& database);
+	bool display_load(data& database);
 private:
 
 	struct row_column
@@ -238,4 +241,10 @@ private:
 	label control_label;
 	menu control_menu;
 	frame* control_frame;
+
+	text_box save_text_box;
+	frame* save_frame;
+
+	menu load_menu;
+	frame* load_frame;
 };

@@ -53,6 +53,8 @@ public:
 	std::vector<player_cards> investigate();
 	int save(const std::string& path);
 	int load(const std::string& path);
+	int get_current_round();
+	int get_current_turn();
 
 private:
 	bool append_card(std::vector<player_cards>& cards_data, const std::string& card, int turn_order);

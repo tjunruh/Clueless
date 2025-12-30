@@ -15,7 +15,9 @@ int main()
 	frame* turn_entry_frame = new frame();
 	frame* report_frame = new frame();
 	frame* control_frame = new frame();
-	display display_manager(initialization_frame, turn_entry_frame, report_frame, control_frame);
+	frame* save_frame = new frame();
+	frame* load_frame = new frame();
+	display display_manager(initialization_frame, turn_entry_frame, report_frame, control_frame, save_frame, load_frame);
 	data database;
 
 	std::string logo_content = "";
@@ -37,16 +39,29 @@ int main()
 	int round = 1;
 	int turn = 0;
 
+	bool initialize_game = true;
+	bool setup_game = true;
+
 	ascii_io::hide_cursor();
+	std::string selection = "";
 	do
 	{
-		home_frame->display();
-		std::string selection = "";
 		int key_stroke = ascii_io::undefined;
-		initialization_menu.get_selection(selection, key_stroke);
+		if (initialize_game)
+		{
+			home_frame->display();
+			initialization_menu.get_selection(selection, key_stroke);
+			setup_game = true;
+		}
+
 		if (selection == "New Game")
 		{
-			bool setup_complete = display_manager.display_setup(database);
+			bool setup_complete = true;
+			if (setup_game)
+			{
+				setup_complete = display_manager.display_setup(database);
+			}
+
 			if (setup_complete)
 			{
 				display::turn_entry_feedback feedback = display::turn_entry_feedback::none;
@@ -77,7 +92,38 @@ int main()
 							round--;
 						}
 					}
-				} while(feedback != display::turn_entry_feedback::save);
+					else if (feedback == display::turn_entry_feedback::save)
+					{
+						bool game_saved = display_manager.display_save(database);
+						if (game_saved)
+						{
+							initialize_game = true;
+							break;
+						}
+					}
+					else if (feedback == display::turn_entry_feedback::exit)
+					{
+						initialize_game = true;
+						break;
+					}
+
+				} while(true);
+			}
+		}
+		else if (selection == "Load Game")
+		{
+			bool game_loaded = display_manager.display_load(database);
+			if (game_loaded)
+			{
+				round = database.get_current_round();
+				turn = database.get_current_turn();
+				initialize_game = false;
+				setup_game = false;
+				selection = "New Game";
+			}
+			else
+			{
+				initialize_game = true;
 			}
 		}
 		else if (selection == "Exit")
@@ -91,6 +137,8 @@ int main()
 	delete(turn_entry_frame);
 	delete(report_frame);
 	delete(control_frame);
+	delete(save_frame);
+	delete(load_frame);
 	ascii_io::show_cursor();
 	ascii_io::ascii_engine_end();
 }

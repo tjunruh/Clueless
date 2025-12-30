@@ -1,7 +1,8 @@
 #include "display.h"
+#include "archive.h"
 #include <ascii_engine/ascii_io.h>
 
-display::display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display) :
+display::display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display, frame* save_display, frame* load_display) :
 	number_of_players_label(initialization_display),
 	number_of_players_text_box(initialization_display, "merge"),
 	your_name_label(initialization_display, "merge"),
@@ -35,7 +36,11 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	accusation_suggestions_label(report_display, "merge"),
 
 	control_label(control_display),
-	control_menu(control_display, "new line")
+	control_menu(control_display, "new line"),
+
+	save_text_box(save_display),
+
+	load_menu(load_display)
 {
 	initialization_frame = initialization_display;
 	number_of_players_label.set_output("Enter Number of Players (2-6)");
@@ -119,7 +124,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 
 	turn_entry_frame = turn_entry_display;
 
-	turn_entry_frame->set_selection_exit_keys({ascii_io::o});
+	turn_entry_frame->set_selection_exit_keys({ascii_io::o, ascii_io::s});
 
 	round_label.set_output("Round: ");
 	round_label.set_alignment("center");
@@ -287,6 +292,25 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	
 	control_menu.add_border(true);
 	control_menu.set_alignment("center block");
+
+	save_frame = save_display;
+
+	save_text_box.set_spacing(20, 0, 0, 0);
+	save_text_box.add_border(true);
+	save_text_box.use_spacing_width_multipliers(true);
+	save_text_box.set_width_multiplier(3.0f);
+	save_text_box.set_spacing_width_multipliers(3.0f, 3.0f);
+	save_text_box.set_title("Enter Game Name");
+
+	load_frame = load_display;
+
+	load_menu.set_spacing(5, 0, 0, 0);
+	load_menu.add_border(true);
+	load_menu.use_spacing_width_multipliers(true);
+	load_menu.set_width_multiplier(3.0f);
+	load_menu.set_spacing_width_multipliers(3.0f, 3.0f);
+	load_menu.set_title("Select Game to Load");
+	load_menu.enable_quit(true);
 }
 
 bool display::display_setup(data& database)
@@ -525,15 +549,6 @@ bool display::display_setup(data& database)
 		database.set_player_name(player_4_name, 3);
 		database.set_player_name(player_5_name, 4);
 		database.set_player_name(player_6_name, 5);
-		answering_player_menu.remove_all_items();
-		answering_player_menu.append_item("None");
-		for (int i = 0; i < number_of_players; i++)
-		{
-			std::string player_name = database.get_player_name(i);
-			answering_player_menu.append_item(player_name);
-			report_board.set_tile(0, i, player_name);
-		}
-		answering_player_menu.build();
 	}
 
 	number_of_players_text_box.clear();
@@ -558,6 +573,16 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 	std::string weapon = "None";
 	std::string answering_player_name = "None";
 	std::string known_card = "None";
+
+	answering_player_menu.remove_all_items();
+	answering_player_menu.append_item("None");
+	for (int i = 0; i < database.get_number_of_players(); i++)
+	{
+		std::string player_name = database.get_player_name(i);
+		answering_player_menu.append_item(player_name);
+		report_board.set_tile(0, i, player_name);
+	}
+	answering_player_menu.build();
 
 	if (database.turn_recorded(round, asking_player_turn_order))
 	{
@@ -610,6 +635,11 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 				display_overview(database.investigate());
 				ascii_io::zoom_to_level(0, 300);
 				turn_entry_frame->display();
+			}
+			else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::s)
+			{
+				feedback = save;
+				break;
 			}
 			else if (lock_unlock_label.get_output() == "lock")
 			{
@@ -751,6 +781,11 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 				ascii_io::zoom_to_level(0, 300);
 				turn_entry_frame->display();
 			}
+			else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::s)
+			{
+				feedback = save;
+				break;
+			}
 			else if (lock_unlock_label.get_output() == "lock")
 			{
 				if (selection == suspect_menu)
@@ -885,6 +920,89 @@ void display::display_overview(const std::vector<data::player_cards>& known_card
 	report_frame->display();
 
 	ascii_io::wait_for_keystroke({ascii_io::enter});
+}
+
+bool display::display_save(data& database)
+{
+	bool saved = false;
+	do
+	{
+		unsigned int exit_keystroke = save_text_box.write();
+		if (exit_keystroke == ascii_io::enter)
+		{
+			std::string game_name = save_text_box.get_text();
+			if (game_name != "" && !archive::duplicate_name(game_name))
+			{
+				int status = archive::save_game(game_name, database);
+				if (status == SUCCESS)
+				{
+					saved = true;
+					break;
+				}
+			}
+		}
+		else
+		{
+			saved = false;
+			break;
+		}
+
+	} while(true);
+
+	return saved;
+}
+
+bool display::display_load(data& database)
+{
+	bool loaded = false;
+	load_menu.remove_all_items();
+
+	std::vector<std::string> saved_games = archive::get_saved_game_names();
+	for (unsigned int i = 0; i < saved_games.size(); i++)
+	{
+		load_menu.append_item(saved_games[i]);
+	}
+
+	load_menu.build();
+
+	do
+	{
+		std::string selection = "";
+		int key_stroke = ascii_io::undefined;
+		load_menu.get_selection(selection, key_stroke);
+		if (key_stroke == ascii_io::enter)
+		{
+			int status = archive::load_game(selection, database);
+			if (status == SUCCESS)
+			{
+				loaded = true;
+				break;
+			}
+			else
+			{
+				loaded = false;
+			}
+		}
+		else if (key_stroke == ascii_io::q)
+		{
+			loaded = false;
+			break;
+		}
+		else
+		{
+			archive::delete_game(selection);
+			std::vector<std::string> saved_games = archive::get_saved_game_names();
+			for (unsigned int i = 0; i < saved_games.size(); i++)
+			{
+				load_menu.append_item(saved_games[i]);
+			}
+
+			load_menu.build();
+		}
+
+	} while (true);
+
+	return loaded;
 }
 
 void display::render_name_text_boxes(int number_of_players)

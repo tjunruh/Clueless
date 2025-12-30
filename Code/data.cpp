@@ -584,6 +584,18 @@ int data::save(const std::string& path)
 	game_data["murder_room"] = murder_room;
 	game_data["murder_weapon"] = murder_weapon;
 
+	nlohmann::json total_player_data;
+	for (unsigned int i = 0; i < players.size(); i++)
+	{
+		nlohmann::json player_data;
+		player_data["name"] = players[i].name;
+		player_data["turn_order"] = players[i].turn_order;
+		player_data["out"] = players[i].out;
+		total_player_data.push_back(player_data);
+	}
+
+	game_data["players"] = total_player_data;
+
 	int status = file_manager::write_file(path, game_data.dump(3));
 	return status;
 }
@@ -622,6 +634,17 @@ int data::load(const std::string& path)
 			guilty_suspect = game_data["guilty_suspect"];
 			murder_room = game_data["murder_room"];
 			murder_weapon = game_data["murder_weapon"];
+
+			players.clear();
+			nlohmann::json player_data = game_data["players"];
+			for (auto itr = player_data.begin(); itr != player_data.end(); ++itr)
+			{
+				player_name_turn_order_container player;
+				player.name = (*itr)["name"];
+				player.turn_order = (*itr)["turn_order"];
+				player.out = (*itr)["out"];
+				players.push_back(player);
+			}
 
 			status = SUCCESS;
 		}
@@ -680,6 +703,11 @@ bool data::loaded_data_valid(const nlohmann::json& game_data)
 		return false;
 	}
 
+	if (!game_data.contains("players") || !game_data["players"].is_array())
+	{
+		return false;
+	}
+
 	nlohmann::json turn_history_data = game_data["turn_history"];
 
 	for (auto itr = turn_history_data.begin(); itr != turn_history_data.end(); ++itr)
@@ -714,11 +742,70 @@ bool data::loaded_data_valid(const nlohmann::json& game_data)
 			return false;
 		}
 
-		if (!(*itr).contains("known_card") || (*itr)["known_card"].is_string())
+		if (!(*itr).contains("known_card") || !(*itr)["known_card"].is_string())
+		{
+			return false;
+		}
+	}
+
+	nlohmann::json player_data = game_data["players"];
+
+	for (auto itr = player_data.begin(); itr != player_data.end(); ++itr)
+	{
+		if (!(*itr).contains("name") || !(*itr)["name"].is_string())
+		{
+			return false;
+		}
+
+		if (!(*itr).contains("turn_order") || !(*itr)["turn_order"].is_number_integer())
+		{
+			return false;
+		}
+
+		if (!(*itr).contains("out") || !(*itr)["out"].is_boolean())
 		{
 			return false;
 		}
 	}
 
 	return true;
+}
+
+int data::get_current_round()
+{
+	int round = 0;
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round > round)
+		{
+			round = turn_history[i].round;
+		}
+	}
+
+	return round;
+}
+
+int data::get_current_turn()
+{
+	int current_turn = 0;
+	int round = get_current_round();
+
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order > current_turn)
+		{
+			current_turn = turn_history[i].asking_player_turn_order;
+		}
+	}
+
+	if (current_turn + 1 < number_of_players)
+	{
+		current_turn = current_turn + 1;
+	}
+	else
+	{
+		current_turn = 0;
+	}
+
+	return current_turn;
 }
