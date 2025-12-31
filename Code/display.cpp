@@ -699,6 +699,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 			known_card_menu.append_item(turn_data.suspect);
 			known_card_menu.append_item(turn_data.room);
 			known_card_menu.append_item(turn_data.weapon);
+			known_card = turn_data.known_card;
 		}
 
 		known_card_menu.build();
