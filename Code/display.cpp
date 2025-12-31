@@ -42,6 +42,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	eliminated_players_entered_menu(eliminated_players_display)
 {
 	initialization_frame = initialization_display;
+	initialization_frame->enable_dec(true);
 
 	number_of_players_text_box.add_border(true);
 	number_of_players_text_box.use_spacing_width_multipliers(true);
@@ -111,6 +112,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	ok_label.set_selectable(true);
 
 	turn_entry_frame = turn_entry_display;
+	turn_entry_frame->enable_dec(true);
 
 	turn_entry_frame->set_selection_exit_keys({ascii_io::o, ascii_io::s, ascii_io::e, ascii_io::r});
 
@@ -228,6 +230,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	forward_label.set_selectable(true);
 
 	report_frame = report_display;
+	report_frame->enable_dec(true);
 
 	report_board.use_spacing_width_multipliers(true);
 	report_board.set_width_multiplier(3.0f);
@@ -253,12 +256,14 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	accusation_suggestions_label.set_lines_count(10);
 
 	control_frame = control_display;
+	control_frame->enable_dec(true);
 	
 	control_menu.add_border(true);
 	control_menu.set_alignment("center block");
 	control_menu.set_title("Controls");
 
 	save_frame = save_display;
+	save_frame->enable_dec(true);
 
 	save_text_box.set_spacing(20, 0, 0, 0);
 	save_text_box.add_border(true);
@@ -268,6 +273,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	save_text_box.set_title("Enter Game Name");
 
 	load_frame = load_display;
+	load_frame->enable_dec(true);
 
 	load_menu.set_spacing(5, 0, 0, 0);
 	load_menu.add_border(true);
@@ -279,6 +285,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	load_menu.set_controls({ascii_io::enter, ascii_io::DEL}, ascii_io::up, ascii_io::down, ascii_io::left, ascii_io::right, ascii_io::q);
 
 	own_cards_entry_frame = own_cards_entry_display;
+	own_cards_entry_frame->enable_dec(true);
 
 	own_cards_entry_menu.append_item(cards::colonel_mustard);
 	own_cards_entry_menu.append_item(cards::professor_plum);
@@ -323,6 +330,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	own_cards_entered_menu.build();
 
 	eliminated_players_frame = eliminated_players_display;
+	eliminated_players_frame->enable_dec(true);
 
 	eliminated_players_entry_menu.add_border(true);
 	eliminated_players_entry_menu.use_spacing_width_multipliers(true);
