@@ -11,7 +11,7 @@
 class display
 {
 public:
-	display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display, frame* save_display, frame* load_display, frame* own_cards_entry_display);
+	display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display, frame* save_display, frame* load_display, frame* own_cards_entry_display, frame* eliminated_players_display);
 
 	enum turn_entry_feedback
 	{
@@ -22,6 +22,7 @@ public:
 		save,
 		settings,
 		entry,
+		remove,
 		exit
 	};
 
@@ -31,6 +32,8 @@ public:
 	bool display_save(data& database);
 	bool display_load(data& database);
 	void display_own_cards_entry(data& database);
+	void display_eliminated_players_entry(data& database);
+
 private:
 
 	struct row_column
@@ -253,4 +256,8 @@ private:
 	menu own_cards_entry_menu;
 	menu own_cards_entered_menu;
 	frame* own_cards_entry_frame;
+
+	menu eliminated_players_entry_menu;
+	menu eliminated_players_entered_menu;
+	frame* eliminated_players_frame;
 };

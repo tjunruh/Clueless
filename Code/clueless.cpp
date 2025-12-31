@@ -18,7 +18,8 @@ int main()
 	frame* save_frame = new frame();
 	frame* load_frame = new frame();
 	frame* own_cards_entry_frame = new frame();
-	display display_manager(initialization_frame, turn_entry_frame, report_frame, control_frame, save_frame, load_frame, own_cards_entry_frame);
+	frame* eliminate_players_display = new frame();
+	display display_manager(initialization_frame, turn_entry_frame, report_frame, control_frame, save_frame, load_frame, own_cards_entry_frame, eliminate_players_display);
 	data database;
 
 	std::string logo_content = "";
@@ -75,31 +76,53 @@ int main()
 					feedback = display_manager.display_turn_entry(database, round, turn);
 					if (feedback == display::turn_entry_feedback::forward)
 					{
-						if (turn + 1 < database.get_number_of_players())
+						do
 						{
-							turn++;
-						}
-						else
-						{
-							turn = 0;
-							round++;
-						}
+							if (turn + 1 < database.get_number_of_players())
+							{
+								turn++;
+							}
+							else
+							{
+								turn = 0;
+								round++;
+							}
+						} while (database.get_player_out(turn) && !database.turn_recorded(round, turn));
 					}
 					else if (feedback == display::turn_entry_feedback::backward)
 					{
-						if (turn - 1 >= 0)
+						do
 						{
-							turn--;
-						}
-						else if (round - 1 >= 1)
-						{
-							turn = database.get_number_of_players() - 1;
-							round--;
-						}
+							if (turn - 1 >= 0)
+							{
+								turn--;
+							}
+							else if (round - 1 >= 1)
+							{
+								turn = database.get_number_of_players() - 1;
+								round--;
+							}
+						} while (database.get_player_out(turn) && !database.turn_recorded(round, turn));
 					}
 					else if (feedback == display::turn_entry_feedback::entry)
 					{
 						display_manager.display_own_cards_entry(database);
+					}
+					else if (feedback == display::turn_entry_feedback::remove)
+					{
+						display_manager.display_eliminated_players_entry(database);
+						while (database.get_player_out(turn) && !database.turn_recorded(round, turn))
+						{
+							if (turn + 1 < database.get_number_of_players())
+							{
+								turn++;
+							}
+							else
+							{
+								turn = 0;
+								round++;
+							}
+						}
 					}
 					else if (feedback == display::turn_entry_feedback::save)
 					{
@@ -149,6 +172,7 @@ int main()
 	delete(save_frame);
 	delete(load_frame);
 	delete(own_cards_entry_frame);
+	delete(eliminate_players_display);
 	ascii_io::show_cursor();
 	ascii_io::ascii_engine_end();
 }
