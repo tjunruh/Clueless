@@ -741,19 +741,75 @@ std::string data::generate_probability_report(const std::vector<player_cards>& i
 		}
 	}
 
-	unsigned int probability = known_suspects.size() * known_rooms.size() * known_weapons.size();
-	report = "Possible Combinations:\nProbability of Being Correct: " + std::to_string(probability) + "%\n";
-	report = report + "Form (Suspect, Room, Weapon)\n";
+	unsigned int total_combinations = 0;
+	unsigned int known_combinations = 0;
 
-	for (unsigned int i = 0; i < cards::suspects.size(); i++)
+	if (one_of_each_murder_element)
 	{
-		for (unsigned int j = 0; j < cards::rooms.size(); j++)
+		total_combinations = cards::suspects.size() * cards::rooms.size() * cards::weapons.size();
+		known_combinations = known_suspects.size() * known_rooms.size() * known_weapons.size();
+	}
+	else
+	{
+		unsigned int total_cards = cards::suspects.size() + cards::rooms.size() + cards::weapons.size();
+		total_combinations = 1;
+		for (unsigned int i = 2; i < total_cards; i++)
 		{
-			for (unsigned int k = 0; k < cards::weapons.size(); k++)
+			total_combinations = total_combinations * i;
+		}
+
+		unsigned int known_cards = known_suspects.size() + known_rooms.size() + known_weapons.size();
+		known_combinations = 0;
+		for (unsigned int i = 2; i < known_cards; i++)
+		{
+			known_combinations = known_combinations * i;
+		}
+	}
+
+	unsigned int possible_combinations = total_combinations - known_combinations;
+	float probability = 1.0 / (float)possible_combinations;
+
+	report = "Possible Combinations:\nProbability of Being Correct: " + std::to_string(probability) + "%\n";
+
+	if (one_of_each_murder_element)
+	{
+		report = report + "Form (Suspect, Room, Weapon)\n";
+		for (unsigned int i = 0; i < cards::suspects.size(); i++)
+		{
+			for (unsigned int j = 0; j < cards::rooms.size(); j++)
 			{
-				if (!card_present(known_suspects, cards::suspects[i]) && !card_present(known_rooms, cards::rooms[j]) && !card_present(known_weapons, cards::weapons[k]))
+				for (unsigned int k = 0; k < cards::weapons.size(); k++)
 				{
-					report = report + "(" + cards::suspects[i] + ", " + cards::rooms[j] + ", " + cards::weapons[k] + ")\n";
+					if (!card_present(known_suspects, cards::suspects[i]) && !card_present(known_rooms, cards::rooms[j]) && !card_present(known_weapons, cards::weapons[k]))
+					{
+						report = report + "(" + cards::suspects[i] + ", " + cards::rooms[j] + ", " + cards::weapons[k] + ")\n";
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		std::vector<std::string> all_cards;
+		all_cards.insert(all_cards.end(), cards::suspects.begin(), cards::suspects.end());
+		all_cards.insert(all_cards.end(), cards::rooms.begin(), cards::rooms.end());
+		all_cards.insert(all_cards.end(), cards::weapons.begin(), cards::weapons.end());
+
+		std::vector<std::string> all_known_cards;
+		all_known_cards.insert(all_known_cards.end(), known_suspects.begin(), known_suspects.end());
+		all_known_cards.insert(all_known_cards.end(), known_rooms.begin(), known_rooms.end());
+		all_known_cards.insert(all_known_cards.end(), known_weapons.begin(), known_weapons.end());
+
+		for (unsigned int i = 0; i < all_cards.size() - 2; i++)
+		{
+			for (unsigned int j = i + 1; j < all_cards.size() - 1; j++)
+			{
+				for (unsigned int k = j + 1; k < all_cards.size(); k++)
+				{
+					if (!card_present(all_known_cards, all_cards[i]) && !card_present(all_known_cards, all_cards[j]) && !card_present(all_known_cards, all_cards[k]))
+					{
+						report = report + "(" + all_cards[i] + ", " + all_cards[j] + ", " + all_cards[k] + ")\n";
+					}
 				}
 			}
 		}
