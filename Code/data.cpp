@@ -473,21 +473,6 @@ bool data::add_cards_based_on_cards(std::vector<player_cards>& card_data)
 		bool room_state_determined = false;
 		bool weapon_state_determined = false;
 
-		if (one_of_each_murder_element && guilty_suspect != "")
-		{
-			suspect_state_determined = true;
-		}
-
-		if (one_of_each_murder_element && murder_room != "")
-		{
-			room_state_determined = true;
-		}
-
-		if (one_of_each_murder_element && murder_weapon != "")
-		{
-			weapon_state_determined = true;
-		}
-
 		for (unsigned int j = 0; j < card_data.size(); j++)
 		{
 			if (turn_history[i].answering_player_turn_order != card_data[j].turn_order)
@@ -598,9 +583,6 @@ int data::save(const std::string& path)
 	}
 
 	game_data["turn_history"] = total_turn_data;
-	game_data["guilty_suspect"] = guilty_suspect;
-	game_data["murder_room"] = murder_room;
-	game_data["murder_weapon"] = murder_weapon;
 
 	nlohmann::json total_player_data;
 	for (unsigned int i = 0; i < players.size(); i++)
@@ -650,10 +632,6 @@ int data::load(const std::string& path)
 				turn_data.known_card = (*itr)["known_card"];
 				turn_history.push_back(turn_data);
 			}
-
-			guilty_suspect = game_data["guilty_suspect"];
-			murder_room = game_data["murder_room"];
-			murder_weapon = game_data["murder_weapon"];
 
 			players.clear();
 			nlohmann::json player_data = game_data["players"];
@@ -706,21 +684,6 @@ bool data::loaded_data_valid(const nlohmann::json& game_data)
 	}
 
 	if (!game_data.contains("turn_history") || !game_data["turn_history"].is_array())
-	{
-		return false;
-	}
-
-	if (!game_data.contains("guilty_suspect") || !game_data["guilty_suspect"].is_string())
-	{
-		return false;
-	}
-
-	if (!game_data.contains("murder_room") || !game_data["murder_room"].is_string())
-	{
-		return false;
-	}
-
-	if (!game_data.contains("murder_weapon") || !game_data["murder_weapon"].is_string())
 	{
 		return false;
 	}

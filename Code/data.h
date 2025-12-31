@@ -85,8 +85,4 @@ private:
 	std::vector<player_name_turn_order_container> players;
 	std::vector<turn> turn_history;
 	std::vector<std::string> own_cards;
-
-	std::string guilty_suspect = "";
-	std::string murder_room = "";
-	std::string murder_weapon = "";
 };
