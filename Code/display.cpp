@@ -3,9 +3,7 @@
 #include <ascii_engine/ascii_io.h>
 
 display::display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display, frame* save_display, frame* load_display, frame* own_cards_entry_display, frame* eliminated_players_display) :
-	number_of_players_label(initialization_display),
-	number_of_players_text_box(initialization_display, "merge"),
-	your_name_label(initialization_display, "merge"),
+	number_of_players_text_box(initialization_display),
 	your_name_text_box(initialization_display, "merge"),
 	players_names_label(initialization_display),
 	player_2_name_text_box(initialization_display, "merge"),
@@ -18,13 +16,9 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 
 	round_label(turn_entry_display),
 	asking_player_label(turn_entry_display, "new line"),
-	suspect_label(turn_entry_display, "new line"),
-	suspect_menu(turn_entry_display, "merge"),
-	room_label(turn_entry_display),
-	room_menu(turn_entry_display, "merge"),
-	weapon_label(turn_entry_display),
-	weapon_menu(turn_entry_display, "merge"),
-	answering_player_label(turn_entry_display, "new line"),
+	suspect_menu(turn_entry_display, "new line"),
+	room_menu(turn_entry_display),
+	weapon_menu(turn_entry_display),
 	answering_player_menu(turn_entry_display, "new line"),
 	known_card_menu(turn_entry_display, "new line"),
 	back_label(turn_entry_display, "new line"),
@@ -35,8 +29,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	investigation_suggestions_label(report_display),
 	accusation_suggestions_label(report_display, "merge"),
 
-	control_label(control_display),
-	control_menu(control_display, "new line"),
+	control_menu(control_display),
 
 	save_text_box(save_display),
 
@@ -49,31 +42,20 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	eliminated_players_entered_menu(eliminated_players_display)
 {
 	initialization_frame = initialization_display;
-	number_of_players_label.set_output("Enter Number of Players (2-6)");
-	number_of_players_label.set_alignment("center");
-	number_of_players_label.use_spacing_width_multipliers(true);
-	number_of_players_label.set_width_multiplier(3.0f);
-	number_of_players_label.set_spacing_width_multipliers(1.0f, 0.5f);
-	number_of_players_label.set_spacing(6, 0, 0, 0);
 
 	number_of_players_text_box.add_border(true);
 	number_of_players_text_box.use_spacing_width_multipliers(true);
 	number_of_players_text_box.set_width_multiplier(3.0f);
 	number_of_players_text_box.set_spacing_width_multipliers(1.0f, 0.5f);
-	number_of_players_text_box.set_spacing(0, 3, 0, 0);
+	number_of_players_text_box.set_spacing(6, 3, 0, 0);
+	number_of_players_text_box.set_title("Enter Number of Players (2-6)");
 	number_of_players_text_box.set_max_characters(1);
-
-	your_name_label.set_output("Enter Your Name");
-	your_name_label.set_alignment("center");
-	your_name_label.use_spacing_width_multipliers(true);
-	your_name_label.set_width_multiplier(3.0f);
-	your_name_label.set_spacing_width_multipliers(1.0f, 0.5f);
-	your_name_label.set_spacing(0, 0, 0, 0);
 
 	your_name_text_box.add_border(true);
 	your_name_text_box.use_spacing_width_multipliers(true);
 	your_name_text_box.set_width_multiplier(3.0f);
 	your_name_text_box.set_spacing_width_multipliers(1.0f, 0.5f);
+	your_name_text_box.set_title("Enter Your Name");
 
 	players_names_label.set_output("Enter Your Opponents's Names in Turn Order After You");
 	players_names_label.set_alignment("center");
@@ -148,12 +130,6 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	asking_player_label.set_spacing_width_multipliers(3.0f, 3.0f);
 	asking_player_label.set_spacing(0, 2, 0, 0);
 
-	suspect_label.set_output("Suspect");
-	suspect_label.set_alignment("center");
-	suspect_label.use_spacing_width_multipliers(true);
-	suspect_label.set_width_multiplier(2.33f);
-	suspect_label.set_spacing_width_multipliers(0.5f, 0.25f);
-
 	suspect_menu.append_item("None");
 	suspect_menu.append_item(cards::colonel_mustard);
 	suspect_menu.append_item(cards::professor_plum);
@@ -167,13 +143,8 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	suspect_menu.set_spacing_width_multipliers(0.5f, 0.25f);
 	suspect_menu.set_spacing(0, 2, 0, 0);
 	suspect_menu.enable_quit(true);
+	suspect_menu.set_title("Suspect");
 	suspect_menu.build();
-
-	room_label.set_output("Room");
-	room_label.set_alignment("center");
-	room_label.use_spacing_width_multipliers(true);
-	room_label.set_width_multiplier(2.33f);
-	room_label.set_spacing_width_multipliers(0.25f, 0.25f);
 
 	room_menu.append_item("None");
 	room_menu.append_item(cards::hall);
@@ -191,13 +162,8 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	room_menu.set_spacing_width_multipliers(0.25f, 0.25f);
 	room_menu.set_spacing(0, 2, 0, 0);
 	room_menu.enable_quit(true);
+	room_menu.set_title("Room");
 	room_menu.build();
-
-	weapon_label.set_output("Weapon");
-	weapon_label.set_alignment("center");
-	weapon_label.use_spacing_width_multipliers(true);
-	weapon_label.set_width_multiplier(2.33f);
-	weapon_label.set_spacing_width_multipliers(0.25f, 0.5f);
 
 	weapon_menu.append_item("None");
 	weapon_menu.append_item(cards::knife);
@@ -212,14 +178,8 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	weapon_menu.set_spacing_width_multipliers(0.25f, 0.5f);
 	weapon_menu.set_spacing(0, 2, 0, 0);
 	weapon_menu.enable_quit(true);
+	weapon_menu.set_title("Weapon");
 	weapon_menu.build();
-
-	answering_player_label.set_output("Answering Player");
-	answering_player_label.set_alignment("center");
-	answering_player_label.add_border(true);
-	answering_player_label.use_spacing_width_multipliers(true);
-	answering_player_label.set_width_multiplier(3.0f);
-	answering_player_label.set_spacing_width_multipliers(3.0f, 3.0f);
 
 	answering_player_menu.append_item("None");
 	answering_player_menu.add_border(true);
@@ -228,6 +188,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	answering_player_menu.set_spacing_width_multipliers(3.0f, 3.0f);
 	answering_player_menu.set_spacing(0, 2, 0, 0);
 	answering_player_menu.enable_quit(true);
+	answering_player_menu.set_title("Ansering Player");
 	answering_player_menu.build();
 
 	known_card_menu.append_item("None");
@@ -292,12 +253,10 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	accusation_suggestions_label.set_lines_count(10);
 
 	control_frame = control_display;
-
-	control_label.set_output("Controls");
-	control_label.set_alignment("center");
 	
 	control_menu.add_border(true);
 	control_menu.set_alignment("center block");
+	control_menu.set_title("Controls");
 
 	save_frame = save_display;
 

@@ -208,9 +208,7 @@ private:
 	row_column get_board_report_coordinate(int player_turn_order, const std::string& card);
 	void reset_known_card_menu(data& database, int round, int player_turn_order, std::string& known_card);
 
-	label number_of_players_label;
 	text_box number_of_players_text_box;
-	label your_name_label;
 	text_box your_name_text_box;
 	label players_names_label;
 	text_box player_2_name_text_box;
@@ -224,13 +222,9 @@ private:
 
 	label round_label;
 	label asking_player_label;
-	label suspect_label;
 	menu suspect_menu;
-	label room_label;
 	menu room_menu;
-	label weapon_label;
 	menu weapon_menu;
-	label answering_player_label;
 	menu answering_player_menu;
 	menu known_card_menu;
 	label back_label;
@@ -243,7 +237,6 @@ private:
 	label accusation_suggestions_label;
 	frame* report_frame;
 
-	label control_label;
 	menu control_menu;
 	frame* control_frame;
 
