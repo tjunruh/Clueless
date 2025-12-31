@@ -210,6 +210,7 @@ private:
 
 	text_box number_of_players_text_box;
 	text_box your_name_text_box;
+	menu one_of_each_murder_element_menu;
 	label players_names_label;
 	text_box player_2_name_text_box;
 	text_box player_3_name_text_box;

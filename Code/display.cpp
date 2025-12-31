@@ -5,6 +5,7 @@
 display::display(frame* initialization_display, frame* turn_entry_display, frame* report_display, frame* control_display, frame* save_display, frame* load_display, frame* own_cards_entry_display, frame* eliminated_players_display) :
 	number_of_players_text_box(initialization_display),
 	your_name_text_box(initialization_display, "merge"),
+	one_of_each_murder_element_menu(initialization_display, "merge"),
 	players_names_label(initialization_display),
 	player_2_name_text_box(initialization_display, "merge"),
 	player_3_name_text_box(initialization_display, "merge"),
@@ -56,7 +57,17 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	your_name_text_box.use_spacing_width_multipliers(true);
 	your_name_text_box.set_width_multiplier(3.0f);
 	your_name_text_box.set_spacing_width_multipliers(1.0f, 0.5f);
+	your_name_text_box.set_spacing(0, 3, 0, 0);
 	your_name_text_box.set_title("Enter Your Name");
+
+	one_of_each_murder_element_menu.add_border(true);
+	one_of_each_murder_element_menu.use_spacing_width_multipliers(true);
+	one_of_each_murder_element_menu.set_width_multiplier(3.0f);
+	one_of_each_murder_element_menu.set_spacing_width_multipliers(1.0f, 0.5f);
+	one_of_each_murder_element_menu.set_title("One of Each Murder Element");
+	one_of_each_murder_element_menu.append_item("Yes");
+	one_of_each_murder_element_menu.append_item("No");
+	one_of_each_murder_element_menu.build();
 
 	players_names_label.set_output("Enter Your Opponents's Names in Turn Order After You");
 	players_names_label.set_alignment("center");
@@ -366,6 +377,15 @@ bool display::display_setup(data& database)
 	std::string player_5_name = "";
 	std::string player_6_name = "";
 	bool setup_completed = false;
+	if (database.get_one_of_each_murder_element())
+	{
+		one_of_each_murder_element_menu.set_cursor_index(0);
+	}
+	else
+	{
+		one_of_each_murder_element_menu.set_cursor_index(1);
+	}
+
 	initialization_frame->display();
 
 	do
@@ -420,6 +440,23 @@ bool display::display_setup(data& database)
 			else
 			{
 				your_name_text_box.clear();
+			}
+		}
+		else if (selection == one_of_each_murder_element_menu)
+		{
+			std::string selection = "";
+			int key_stroke = ascii_io::undefined;
+			one_of_each_murder_element_menu.get_selection(selection, key_stroke);
+			if (key_stroke == ascii_io::enter)
+			{
+				if (selection == "Yes")
+				{
+					database.set_one_of_each_murder_element(true);
+				}
+				else if (selection == "No")
+				{
+					database.set_one_of_each_murder_element(false);
+				}
 			}
 		}
 		else if (selection == player_2_name_text_box)
