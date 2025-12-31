@@ -1011,9 +1011,10 @@ void display::display_overview(const std::vector<data::player_cards>& known_card
 	}
 
 	report_board.build();
+	investigation_suggestions_label.set_output(database.generate_probability_report(known_cards));
 	report_frame->display();
 
-	ascii_io::wait_for_keystroke({ascii_io::enter});
+	investigation_suggestions_label.scroll();
 }
 
 bool display::display_save(data& database)

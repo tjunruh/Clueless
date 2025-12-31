@@ -1,4 +1,5 @@
 #include "data.h"
+#include "cards.h"
 #include <ascii_engine/file_manager.h>
 #include <ascii_engine/error_codes.h>
 
@@ -661,6 +662,106 @@ int data::load(const std::string& path)
 	return status;
 }
 
+int data::get_current_round()
+{
+	int round = 0;
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round > round)
+		{
+			round = turn_history[i].round;
+		}
+	}
+
+	int number_of_turns_in_round = 0;
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round)
+		{
+			number_of_turns_in_round++;
+		}
+	}
+
+	if (number_of_turns_in_round == number_of_players)
+	{
+		round++;
+	}
+
+	return round;
+}
+
+int data::get_current_turn()
+{
+	int current_turn = 0;
+	int round = get_current_round();
+
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order > current_turn)
+		{
+			current_turn = turn_history[i].asking_player_turn_order;
+		}
+	}
+
+	if (current_turn + 1 < number_of_players)
+	{
+		current_turn = current_turn + 1;
+	}
+	else
+	{
+		current_turn = 0;
+	}
+
+	return current_turn;
+}
+
+std::string data::generate_probability_report(const std::vector<player_cards>& investigation_information)
+{
+	std::string report = "";
+	std::vector<std::string> known_suspects;
+	std::vector<std::string> known_rooms;
+	std::vector<std::string> known_weapons;
+
+	for (unsigned int i = 0; i < investigation_information.size(); i++)
+	{
+		for (unsigned int j = 0; j < investigation_information[i].cards.size(); j++)
+		{
+			if (cards::is_suspect(investigation_information[i].cards[j]))
+			{
+				known_suspects.push_back(investigation_information[i].cards[j]);
+			}
+			else if (cards::is_room(investigation_information[i].cards[j]))
+			{
+				known_rooms.push_back(investigation_information[i].cards[j]);
+			}
+			else if (cards::is_weapon(investigation_information[i].cards[j]))
+			{
+				known_weapons.push_back(investigation_information[i].cards[j]);
+			}
+		}
+	}
+
+	unsigned int probability = known_suspects.size() * known_rooms.size() * known_weapons.size();
+	report = "Possible Combinations:\nProbability of Being Correct: " + std::to_string(probability) + "%\n";
+	report = report + "Form (Suspect, Room, Weapon)\n";
+
+	for (unsigned int i = 0; i < cards::suspects.size(); i++)
+	{
+		for (unsigned int j = 0; j < cards::rooms.size(); j++)
+		{
+			for (unsigned int k = 0; k < cards::weapons.size(); k++)
+			{
+				if (!card_present(known_suspects, cards::suspects[i]) && !card_present(known_rooms, cards::rooms[j]) && !card_present(known_weapons, cards::weapons[k]))
+				{
+					report = report + "(" + cards::suspects[i] + ", " + cards::rooms[j] + ", " + cards::weapons[k] + ")\n";
+				}
+			}
+		}
+	}
+
+	return report;
+}
+
 bool data::loaded_data_valid(const nlohmann::json& game_data)
 {
 	if (game_data.is_discarded())
@@ -759,57 +860,4 @@ bool data::loaded_data_valid(const nlohmann::json& game_data)
 	}
 
 	return true;
-}
-
-int data::get_current_round()
-{
-	int round = 0;
-	for (unsigned int i = 0; i < turn_history.size(); i++)
-	{
-		if (turn_history[i].round > round)
-		{
-			round = turn_history[i].round;
-		}
-	}
-
-	int number_of_turns_in_round = 0;
-	for (unsigned int i = 0; i < turn_history.size(); i++)
-	{
-		if (turn_history[i].round == round)
-		{
-			number_of_turns_in_round++;
-		}
-	}
-
-	if (number_of_turns_in_round == number_of_players)
-	{
-		round++;
-	}
-
-	return round;
-}
-
-int data::get_current_turn()
-{
-	int current_turn = 0;
-	int round = get_current_round();
-
-	for (unsigned int i = 0; i < turn_history.size(); i++)
-	{
-		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order > current_turn)
-		{
-			current_turn = turn_history[i].asking_player_turn_order;
-		}
-	}
-
-	if (current_turn + 1 < number_of_players)
-	{
-		current_turn = current_turn + 1;
-	}
-	else
-	{
-		current_turn = 0;
-	}
-
-	return current_turn;
 }

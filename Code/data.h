@@ -57,6 +57,7 @@ public:
 	int load(const std::string& path);
 	int get_current_round();
 	int get_current_turn();
+	std::string generate_probability_report(const std::vector<player_cards>& investigation_information);
 
 private:
 	bool append_card(std::vector<player_cards>& cards_data, const std::string& card, int turn_order);
