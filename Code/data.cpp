@@ -35,7 +35,7 @@ void data::set_player_name(const std::string& name, int turn_order)
 
 std::string data::get_player_name(int turn_order)
 {
-	std::string name = "";
+	std::string name = "None";
 	for (unsigned int i = 0; i < players.size(); i++)
 	{
 		if (players[i].turn_order == turn_order)
@@ -46,33 +46,6 @@ std::string data::get_player_name(int turn_order)
 	}
 
 	return name;
-}
-
-void data::set_player_out(bool out, int turn_order)
-{
-	for (unsigned int i = 0; i < players.size(); i++)
-	{
-		if (players[i].turn_order == turn_order)
-		{
-			players[i].out = out;
-			break;
-		}
-	}
-}
-
-bool data::get_player_out(int turn_order)
-{
-	bool out = true;
-	for (unsigned int i = 0; i < players.size(); i++)
-	{
-		if (players[i].turn_order == turn_order)
-		{
-			out = players[i].out;
-			break;
-		}
-	}
-
-	return out;
 }
 
 int data::get_player_turn_order(const std::string& name)
@@ -92,67 +65,15 @@ int data::get_player_turn_order(const std::string& name)
 
 void data::record_turn(turn turn_data)
 {
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (turn_history[i].round == turn_data.round && turn_history[i].asking_player_turn_order == turn_data.asking_player_turn_order)
+		{
+			turn_history.erase(turn_history.begin() + i);
+			break;
+		}
+	}
 	turn_history.push_back(turn_data);
-}
-
-void data::reset_suspect(int round, int asking_player_turn_order, const std::string& suspect)
-{
-	for (unsigned int i = 0; i < turn_history.size(); i++)
-	{
-		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
-		{
-			turn_history[i].suspect = suspect;
-			break;
-		}
-	}
-}
-
-void data::reset_room(int round, int asking_player_turn_order, const std::string& room)
-{
-	for (unsigned int i = 0; i < turn_history.size(); i++)
-	{
-		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
-		{
-			turn_history[i].room = room;
-			break;
-		}
-	}
-}
-
-void data::reset_weapon(int round, int asking_player_turn_order, const std::string& weapon)
-{
-	for (unsigned int i = 0; i < turn_history.size(); i++)
-	{
-		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
-		{
-			turn_history[i].weapon = weapon;
-			break;
-		}
-	}
-}
-
-void data::reset_known_card(int round, int asking_player_turn_order, const std::string& known_card)
-{
-	for (unsigned int i = 0; i < turn_history.size(); i++)
-	{
-		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
-		{
-			turn_history[i].known_card = known_card;
-			break;
-		}
-	}
-}
-
-void data::reset_answering_player_turn_order(int round, int asking_player_turn_order, int answering_player_turn_order)
-{
-	for (unsigned int i = 0; i < turn_history.size(); i++)
-	{
-		if (turn_history[i].round == round && turn_history[i].asking_player_turn_order == asking_player_turn_order)
-		{
-			turn_history[i].answering_player_turn_order = answering_player_turn_order;
-			break;
-		}
-	}
 }
 
 bool data::turn_recorded(int round, int asking_player_turn_order)
@@ -423,12 +344,15 @@ void data::eliminate_cards_based_on_turn_history(std::vector<player_cards>& card
 {
 	for (unsigned int i = 0; i < turn_history.size(); i++)
 	{
-		std::vector<int> players_between = get_players_between(turn_history[i].asking_player_turn_order, turn_history[i].answering_player_turn_order);
-		for (unsigned int j = 0; j < players_between.size(); j++)
+		if (!turn_skipped(turn_history[i]))
 		{
-			append_eliminated_card(card_data, turn_history[i].suspect, players_between[j]);
-			append_eliminated_card(card_data, turn_history[i].room, players_between[j]);
-			append_eliminated_card(card_data, turn_history[i].weapon, players_between[j]);
+			std::vector<int> players_between = get_players_between(turn_history[i].asking_player_turn_order, turn_history[i].answering_player_turn_order);
+			for (unsigned int j = 0; j < players_between.size(); j++)
+			{
+				append_eliminated_card(card_data, turn_history[i].suspect, players_between[j]);
+				append_eliminated_card(card_data, turn_history[i].room, players_between[j]);
+				append_eliminated_card(card_data, turn_history[i].weapon, players_between[j]);
+			}
 		}
 	}
 }
@@ -437,7 +361,7 @@ void data::add_cards_based_on_turn_history(std::vector<player_cards>& card_data)
 {
 	for (unsigned int i = 0; i < turn_history.size(); i++)
 	{
-		if (turn_history[i].known_card != "")
+		if (!turn_skipped(turn_history[i]) && turn_history[i].known_card != "None")
 		{
 			append_card(card_data, turn_history[i].known_card, turn_history[i].answering_player_turn_order);
 		}
@@ -470,45 +394,48 @@ bool data::add_cards_based_on_cards(std::vector<player_cards>& card_data)
 	bool card_data_modified = false;
 	for (unsigned int i = 0; i < turn_history.size(); i++)
 	{
-		bool suspect_state_determined = false;
-		bool room_state_determined = false;
-		bool weapon_state_determined = false;
-
-		for (unsigned int j = 0; j < card_data.size(); j++)
+		if (!turn_skipped(turn_history[i]))
 		{
-			if (turn_history[i].answering_player_turn_order != card_data[j].turn_order)
+			bool suspect_state_determined = false;
+			bool room_state_determined = false;
+			bool weapon_state_determined = false;
+
+			for (unsigned int j = 0; j < card_data.size(); j++)
 			{
-				if (!suspect_state_determined)
+				if (turn_history[i].answering_player_turn_order != card_data[j].turn_order)
 				{
-					suspect_state_determined = card_present(card_data[j].cards, turn_history[i].suspect);
-				}
+					if (!suspect_state_determined)
+					{
+						suspect_state_determined = card_present(card_data[j].cards, turn_history[i].suspect);
+					}
 
-				if (!room_state_determined)
-				{
-					room_state_determined = card_present(card_data[j].cards, turn_history[i].room);
-				}
+					if (!room_state_determined)
+					{
+						room_state_determined = card_present(card_data[j].cards, turn_history[i].room);
+					}
 
-				if (!weapon_state_determined)
-				{
-					weapon_state_determined = card_present(card_data[j].cards, turn_history[i].weapon);
+					if (!weapon_state_determined)
+					{
+						weapon_state_determined = card_present(card_data[j].cards, turn_history[i].weapon);
+					}
 				}
 			}
-		}
 
-		if (suspect_state_determined && room_state_determined && !weapon_state_determined)
-		{
-			bool weapon_appended = append_card(card_data, turn_history[i].weapon, turn_history[i].answering_player_turn_order);
-			card_data_modified = card_data_modified || weapon_appended;
-		}
-		else if (suspect_state_determined && !room_state_determined && weapon_state_determined)
-		{
-			bool room_appended = append_card(card_data, turn_history[i].room, turn_history[i].answering_player_turn_order);
-			card_data_modified = card_data_modified || room_appended;
-		}
-		else if (!suspect_state_determined && room_state_determined && weapon_state_determined)
-		{
-			bool weapon_appended = append_card(card_data, turn_history[i].suspect, turn_history[i].answering_player_turn_order);
-			card_data_modified = card_data_modified || weapon_appended;
+			if (suspect_state_determined && room_state_determined && !weapon_state_determined)
+			{
+				bool weapon_appended = append_card(card_data, turn_history[i].weapon, turn_history[i].answering_player_turn_order);
+				card_data_modified = card_data_modified || weapon_appended;
+			}
+			else if (suspect_state_determined && !room_state_determined && weapon_state_determined)
+			{
+				bool room_appended = append_card(card_data, turn_history[i].room, turn_history[i].answering_player_turn_order);
+				card_data_modified = card_data_modified || room_appended;
+			}
+			else if (!suspect_state_determined && room_state_determined && weapon_state_determined)
+			{
+				bool weapon_appended = append_card(card_data, turn_history[i].suspect, turn_history[i].answering_player_turn_order);
+				card_data_modified = card_data_modified || weapon_appended;
+			}
 		}
 	}
 
@@ -591,7 +518,6 @@ int data::save(const std::string& path)
 		nlohmann::json player_data;
 		player_data["name"] = players[i].name;
 		player_data["turn_order"] = players[i].turn_order;
-		player_data["out"] = players[i].out;
 		total_player_data.push_back(player_data);
 	}
 
@@ -641,7 +567,6 @@ int data::load(const std::string& path)
 				player_name_turn_order_container player;
 				player.name = (*itr)["name"];
 				player.turn_order = (*itr)["turn_order"];
-				player.out = (*itr)["out"];
 				players.push_back(player);
 			}
 
@@ -818,6 +743,17 @@ std::string data::generate_probability_report(const std::vector<player_cards>& i
 	return report;
 }
 
+bool data::turn_skipped(const turn& turn_data)
+{
+	bool skipped = false;
+	if (turn_data.suspect == "None" || turn_data.room == "None" || turn_data.weapon == "None" || (turn_data.asking_player_turn_order == 0 && turn_data.known_card == "None"))
+	{
+		skipped = true;
+	}
+
+	return skipped;
+}
+
 bool data::loaded_data_valid(const nlohmann::json& game_data)
 {
 	if (game_data.is_discarded())
@@ -905,11 +841,6 @@ bool data::loaded_data_valid(const nlohmann::json& game_data)
 		}
 
 		if (!(*itr).contains("turn_order") || !(*itr)["turn_order"].is_number_integer())
-		{
-			return false;
-		}
-
-		if (!(*itr).contains("out") || !(*itr)["out"].is_boolean())
 		{
 			return false;
 		}

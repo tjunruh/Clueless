@@ -31,14 +31,7 @@ public:
 	void set_player_name(const std::string& name, int turn_order);
 	std::string get_player_name(int turn_order);
 	int get_player_turn_order(const std::string& name);
-	void set_player_out(bool out, int turn_order);
-	bool get_player_out(int turn_order);
 	void record_turn(turn turn_data);
-	void reset_suspect(int round, int asking_player_turn_order, const std::string& suspect);
-	void reset_room(int round, int asking_player_turn_order, const std::string& room);
-	void reset_weapon(int round, int asking_player_turn_order, const std::string& weapon);
-	void reset_known_card(int round, int asking_player_turn_order, const std::string& known_card);
-	void reset_answering_player_turn_order(int round, int asking_player_turn_order, int answering_player_turn_order);
 	bool turn_recorded(int round, int asking_player_turn_order);
 	turn get_turn(int round, int asking_player_turn_order);
 	std::string get_suspect(int round, int asking_player_turn_order);
@@ -58,6 +51,7 @@ public:
 	int get_current_round();
 	int get_current_turn();
 	std::string generate_probability_report(const std::vector<player_cards>& investigation_information);
+	bool turn_skipped(const turn& turn_data);
 
 private:
 	bool append_card(std::vector<player_cards>& cards_data, const std::string& card, int turn_order);
@@ -76,7 +70,6 @@ private:
 	{
 		std::string name = "";
 		int turn_order = -1;
-		bool out = false;
 	};
 
 	int number_of_players = 0;
