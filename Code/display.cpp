@@ -874,29 +874,23 @@ void display::display_overview(const std::vector<data::player_cards>& known_card
 	ascii_io::zoom_to_level(-2, 500);
 	report_board.clear_all();
 
-	for (int i = 1; i < database.get_number_of_players(); i++)
+	for (int i = 0; i < database.get_number_of_players(); i++)
 	{
-		report_board.set_tile(0, i - 1, database.get_player_name(i));
+		report_board.set_tile(0, i, database.get_player_name(i));
 	}
 
 	for (unsigned int i = 0; i < known_cards.size(); i++)
 	{
 		for (unsigned int j = 0; j < known_cards[i].cards.size(); j++)
 		{
-			if (known_cards[i].turn_order != 0)
-			{
-				row_column coordinate = get_board_report_coordinate(known_cards[i].turn_order, known_cards[i].cards[j]);
-				report_board.activate_configuration("has", coordinate.row, coordinate.column);
-			}
+			row_column coordinate = get_board_report_coordinate(known_cards[i].turn_order, known_cards[i].cards[j]);
+			report_board.activate_configuration("has", coordinate.row, coordinate.column);
 		}
 
 		for (unsigned int j = 0; j < known_cards[i].eliminated_cards.size(); j++)
 		{
-			if (known_cards[i].turn_order != 0)
-			{
-				row_column coordinate = get_board_report_coordinate(known_cards[i].turn_order, known_cards[i].eliminated_cards[j]);
-				report_board.activate_configuration("hasn't", coordinate.row, coordinate.column);
-			}
+			row_column coordinate = get_board_report_coordinate(known_cards[i].turn_order, known_cards[i].eliminated_cards[j]);
+			report_board.activate_configuration("hasn't", coordinate.row, coordinate.column);
 		}
 	}
 
