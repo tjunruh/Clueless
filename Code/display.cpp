@@ -678,7 +678,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 
 		known_card_menu.remove_all_items();
 		known_card_menu.append_item("None");
-		if (turn_data.known_card != "None")
+		if (turn_data.known_card != "None" || turn_data.asking_player_turn_order == 0)
 		{
 			known_card_menu.append_item(turn_data.suspect);
 			known_card_menu.append_item(turn_data.room);
@@ -727,7 +727,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 		}
 		else if (selection == forward_label)
 		{
-			if ((suspect != "None" && room != "None" && weapon != "None" && answering_player_name != "None" && (asking_player_turn_order != 0 || known_card != "None")) || (suspect == "None" && room == "None" && weapon == "None" && answering_player_name == "None" && (asking_player_turn_order != 0 || known_card == "None")))
+			if ((suspect != "None" && room != "None" && weapon != "None" && (asking_player_turn_order != 0 || answering_player_name == "None" || known_card != "None")) || (suspect == "None" && room == "None" && weapon == "None" && answering_player_name == "None" && (asking_player_turn_order != 0 || known_card == "None")))
 			{
 				feedback = forward;
 				data::turn turn_data;
@@ -737,11 +737,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 				turn_data.room = room;
 				turn_data.weapon = weapon;
 				turn_data.answering_player_turn_order = database.get_player_turn_order(answering_player_name);
-
-				if (asking_player_turn_order == 0)
-				{
-					turn_data.known_card = known_card;
-				}
+				turn_data.known_card = known_card;
 
 				database.record_turn(turn_data);
 				break;
@@ -796,7 +792,7 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 					room = "None";
 					room_menu.set_cursor_index(0);
 				}
-					else
+				else
 				{
 					turn_entry_frame->set_selection(weapon_menu);
 				}
