@@ -684,33 +684,22 @@ std::string data::generate_probability_report(const std::vector<player_cards>& i
 		}
 	}
 
-	unsigned int total_combinations = 0;
-	unsigned int known_combinations = 0;
+	unsigned int unknown_combinations = 0;
 
 	if (one_of_each_murder_element)
 	{
-		total_combinations = cards::suspects.size() * cards::rooms.size() * cards::weapons.size();
-		known_combinations = known_suspects.size() * known_rooms.size() * known_weapons.size();
+		unknown_combinations = (cards::suspects.size() - known_suspects.size()) * (cards::rooms.size() - known_rooms.size()) * (cards::weapons.size() - known_weapons.size());
 	}
 	else
 	{
-		unsigned int total_cards = cards::suspects.size() + cards::rooms.size() + cards::weapons.size();
-		total_combinations = 1;
-		for (unsigned int i = 2; i < total_cards; i++)
+		unsigned int unknown_cards = (cards::suspects.size() - known_suspects.size()) + (cards::rooms.size() - known_rooms.size()) + (cards::weapons.size() - known_weapons.size());
+		for (unsigned int i = 2; i < unknown_cards; i++)
 		{
-			total_combinations = total_combinations * i;
-		}
-
-		unsigned int known_cards = known_suspects.size() + known_rooms.size() + known_weapons.size();
-		known_combinations = 0;
-		for (unsigned int i = 2; i < known_cards; i++)
-		{
-			known_combinations = known_combinations * i;
+			unknown_combinations = unknown_combinations * i;
 		}
 	}
 
-	unsigned int possible_combinations = total_combinations - known_combinations;
-	float probability = 1.0 / (float)possible_combinations;
+	float probability = 100.0f * (1.0f / (float)unknown_combinations);
 
 	report = "Possible Combinations:\nProbability of Being Correct: " + std::to_string(probability) + "%\n";
 
