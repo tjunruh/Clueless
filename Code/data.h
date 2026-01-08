@@ -58,12 +58,10 @@ private:
 	bool append_eliminated_card(std::vector<player_cards>& cards_data, const std::string& card, int turn_order);
 	std::vector<int> get_players_between(int asking_player_turn_order, int answering_player_turn_order);
 	bool card_present(const std::vector<std::string>& cards, const std::string& card);
-	bool card_present(const std::vector<player_cards>& card_data, const std::string& card, int turn_order, bool eliminated);
 	void eliminate_cards_based_on_turn_history(std::vector<player_cards>& card_data);
 	void add_cards_based_on_turn_history(std::vector<player_cards>& card_data);
 	bool eliminate_cards_based_on_cards(std::vector<player_cards>& card_data);
-	bool add_cards_based_on_cards(std::vector<player_cards>& card_data);
-	bool add_cards_based_on_eliminated_cards(std::vector<player_cards>& card_data);
+	bool add_cards_based_on_deductions(std::vector<player_cards>& card_data);
 	bool loaded_data_valid(const nlohmann::json& game_data);
 
 	struct player_name_turn_order_container

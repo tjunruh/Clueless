@@ -236,8 +236,7 @@ std::vector<data::player_cards> data::investigate()
 	do
 	{
 		investigation_information_modified = false;
-		investigation_information_modified = investigation_information_modified || add_cards_based_on_cards(investigation_information);
-		investigation_information_modified = investigation_information_modified || add_cards_based_on_eliminated_cards(investigation_information);
+		investigation_information_modified = investigation_information_modified || add_cards_based_on_deductions(investigation_information);
 		investigation_information_modified = investigation_information_modified || eliminate_cards_based_on_cards(investigation_information);
 	} while (investigation_information_modified);
 
@@ -317,29 +316,6 @@ bool data::card_present(const std::vector<std::string>& cards, const std::string
 	return present;
 }
 
-bool data::card_present(const std::vector<player_cards>& card_data, const std::string& card, int turn_order, bool eliminated)
-{
-	bool present = false;
-	for (unsigned int i = 0; i < card_data.size(); i++)
-	{
-		if (card_data[i].turn_order == turn_order)
-		{
-			if (eliminated)
-			{
-				present = card_present(card_data[i].eliminated_cards, card);
-			}
-			else
-			{
-				present = card_present(card_data[i].cards, card);
-			}
-
-			break;
-		}
-	}
-
-	return present;
-}
-
 void data::eliminate_cards_based_on_turn_history(std::vector<player_cards>& card_data)
 {
 	for (unsigned int i = 0; i < turn_history.size(); i++)
@@ -404,7 +380,7 @@ bool data::eliminate_cards_based_on_cards(std::vector<player_cards>& card_data)
 	return card_data_modified;
 }
 
-bool data::add_cards_based_on_cards(std::vector<player_cards>& card_data)
+bool data::add_cards_based_on_deductions(std::vector<player_cards>& card_data)
 {
 	bool card_data_modified = false;
 	for (unsigned int i = 0; i < turn_history.size(); i++)
@@ -417,21 +393,39 @@ bool data::add_cards_based_on_cards(std::vector<player_cards>& card_data)
 
 			for (unsigned int j = 0; j < card_data.size(); j++)
 			{
-				if (turn_history[i].answering_player_turn_order != card_data[j].turn_order)
+				if (!suspect_state_determined)
 				{
-					if (!suspect_state_determined)
+					if (turn_history[i].answering_player_turn_order != card_data[j].turn_order)
 					{
 						suspect_state_determined = card_present(card_data[j].cards, turn_history[i].suspect);
 					}
+					else if (!suspect_state_determined && card_data[j].turn_order == turn_history[i].answering_player_turn_order)
+					{
+						suspect_state_determined = card_present(card_data[j].eliminated_cards, turn_history[i].suspect);
+					}
+				}
 
-					if (!room_state_determined)
+				if (!room_state_determined)
+				{
+					if (turn_history[i].answering_player_turn_order != card_data[j].turn_order)
 					{
 						room_state_determined = card_present(card_data[j].cards, turn_history[i].room);
 					}
+					else if (!room_state_determined && card_data[j].turn_order == turn_history[i].answering_player_turn_order)
+					{
+						room_state_determined = room_state_determined || card_present(card_data[j].eliminated_cards, turn_history[i].room);
+					}
+				}
 
-					if (!weapon_state_determined)
+				if (!weapon_state_determined)
+				{
+					if (turn_history[i].answering_player_turn_order != card_data[j].turn_order)
 					{
 						weapon_state_determined = card_present(card_data[j].cards, turn_history[i].weapon);
+					}
+					else if (!weapon_state_determined && card_data[j].turn_order == turn_history[i].answering_player_turn_order)
+					{
+						weapon_state_determined = weapon_state_determined || card_present(card_data[j].eliminated_cards, turn_history[i].weapon);
 					}
 				}
 			}
@@ -451,55 +445,6 @@ bool data::add_cards_based_on_cards(std::vector<player_cards>& card_data)
 				bool suspect_appended = append_card(card_data, turn_history[i].suspect, turn_history[i].answering_player_turn_order);
 				card_data_modified = card_data_modified || suspect_appended;
 			}
-		}
-	}
-
-	return card_data_modified;
-}
-
-bool data::add_cards_based_on_eliminated_cards(std::vector<player_cards>& card_data)
-{
-	bool card_data_modified = false;
-	for (unsigned int i = 0; i < turn_history.size(); i++)
-	{
-		if (!turn_skipped(turn_history[i]) && turn_history[i].answering_player_turn_order != -1)
-		{
-			int possible_cards_provided = 3;
-			std::string remaining_card = "";
-			if (card_present(card_data, turn_history[i].suspect, turn_history[i].answering_player_turn_order, true))
-			{
-				possible_cards_provided--;
-			}
-			else
-			{
-				remaining_card = turn_history[i].suspect;
-			}
-
-			if (card_present(card_data, turn_history[i].room, turn_history[i].answering_player_turn_order, true))
-			{
-				possible_cards_provided--;
-			}
-			else
-			{
-				remaining_card = turn_history[i].room;
-			}
-
-			if (card_present(card_data, turn_history[i].weapon, turn_history[i].answering_player_turn_order, true))
-			{
-				possible_cards_provided--;
-			}
-			else
-			{
-				remaining_card = turn_history[i].weapon;
-			}
-
-			bool card_appended = false;
-			if (possible_cards_provided == 1)
-			{
-				card_appended = append_card(card_data, remaining_card, turn_history[i].answering_player_turn_order);
-			}
-
-			card_data_modified = card_data_modified || card_appended;
 		}
 	}
 
