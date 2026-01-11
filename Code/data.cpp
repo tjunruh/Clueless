@@ -433,16 +433,19 @@ bool data::add_cards_based_on_deductions(std::vector<player_cards>& card_data)
 			if (suspect_state_determined && room_state_determined && !weapon_state_determined)
 			{
 				bool weapon_appended = append_card(card_data, turn_history[i].weapon, turn_history[i].answering_player_turn_order);
+				turn_history[i].known_card = turn_history[i].weapon;
 				card_data_modified = card_data_modified || weapon_appended;
 			}
 			else if (suspect_state_determined && !room_state_determined && weapon_state_determined)
 			{
 				bool room_appended = append_card(card_data, turn_history[i].room, turn_history[i].answering_player_turn_order);
+				turn_history[i].known_card = turn_history[i].room;
 				card_data_modified = card_data_modified || room_appended;
 			}
 			else if (!suspect_state_determined && room_state_determined && weapon_state_determined)
 			{
 				bool suspect_appended = append_card(card_data, turn_history[i].suspect, turn_history[i].answering_player_turn_order);
+				turn_history[i].known_card = turn_history[i].suspect;
 				card_data_modified = card_data_modified || suspect_appended;
 			}
 		}
