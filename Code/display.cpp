@@ -256,6 +256,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	investigation_suggestions_label.set_spacing_width_multipliers(0.5f, 1.0f);
 	investigation_suggestions_label.set_spacing(0, 3, 0, 0);
 	investigation_suggestions_label.set_lines_count(-25);
+	investigation_suggestions_label.set_title("Investigation Suggestions");
 
 	accusation_suggestions_label.add_border(true);
 	accusation_suggestions_label.use_spacing_width_multipliers(true);
@@ -263,6 +264,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	accusation_suggestions_label.set_spacing_width_multipliers(0.5f, 1.0f);
 	accusation_suggestions_label.set_spacing(0, 0, 0, 0);
 	accusation_suggestions_label.set_lines_count(10);
+	accusation_suggestions_label.set_title("Accusation Suggestions");
 
 	control_frame = control_display;
 	control_frame->enable_dec(true);
@@ -895,10 +897,25 @@ void display::display_overview(const std::vector<data::player_cards>& known_card
 	}
 
 	report_board.build();
-	investigation_suggestions_label.set_output(database.generate_probability_report(known_cards));
+	accusation_suggestions_label.set_output(database.generate_accusation_probability_report(known_cards));
+	investigation_suggestions_label.set_output(database.generate_investigation_report(known_cards));
 	report_frame->display();
 
-	investigation_suggestions_label.scroll();
+	int input = ascii_io::undefined;
+
+	do
+	{
+		input = ascii_io::getchar();
+
+		if (input == ascii_io::a)
+		{
+			accusation_suggestions_label.scroll();
+		}
+		else if (input == ascii_io::i)
+		{
+			investigation_suggestions_label.scroll();
+		}
+	} while (input != ascii_io::q);
 }
 
 bool display::display_save(data& database)

@@ -26,6 +26,12 @@ public:
 		std::vector<std::string> eliminated_cards;
 	};
 
+	struct card_rating
+	{
+		std::string card = "";
+		int rating = 100;
+	};
+
 	void set_number_of_players(int number);
 	int get_number_of_players();
 	void set_player_name(const std::string& name, int turn_order);
@@ -50,7 +56,8 @@ public:
 	int load(const std::string& path);
 	int get_current_round();
 	int get_current_turn();
-	std::string generate_probability_report(const std::vector<player_cards>& investigation_information);
+	std::string generate_accusation_probability_report(const std::vector<player_cards>& investigation_information);
+	std::string generate_investigation_report(const std::vector<player_cards>& investigation_information);
 	bool turn_skipped(const turn& turn_data);
 
 private:
@@ -63,6 +70,9 @@ private:
 	bool eliminate_cards_based_on_cards(std::vector<player_cards>& card_data);
 	bool add_cards_based_on_deductions(std::vector<player_cards>& card_data);
 	bool loaded_data_valid(const nlohmann::json& game_data);
+	std::vector<card_rating> rate_cards(const std::vector<std::string>& cards_to_rate, const std::vector<player_cards>& investigation_information);
+	bool card_of_type_known(const std::vector<player_cards>& investigation_information, int number_of_cards_in_type, bool (*is_card_type)(const std::string& card));
+	bool no_one_has_card(const std::vector<player_cards>& investigation_information, const std::string& card);
 
 	struct player_name_turn_order_container
 	{

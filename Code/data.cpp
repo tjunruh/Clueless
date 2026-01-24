@@ -606,7 +606,7 @@ int data::get_current_turn()
 	return current_turn;
 }
 
-std::string data::generate_probability_report(const std::vector<player_cards>& investigation_information)
+std::string data::generate_accusation_probability_report(const std::vector<player_cards>& investigation_information)
 {
 	std::string report = "";
 	std::vector<std::string> known_suspects;
@@ -693,6 +693,99 @@ std::string data::generate_probability_report(const std::vector<player_cards>& i
 				}
 			}
 		}
+	}
+
+	return report;
+}
+
+std::string data::generate_investigation_report(const std::vector<player_cards>& investigation_information)
+{
+
+	std::vector<card_rating> suspect_ratings = rate_cards(cards::suspects, investigation_information);
+	std::vector<card_rating> room_ratings = rate_cards(cards::rooms, investigation_information);
+	std::vector<card_rating> weapon_ratings = rate_cards(cards::weapons, investigation_information);
+
+	std::vector<std::string> known_cards;
+	for (unsigned int i = 0; i < investigation_information.size(); i++)
+	{
+		known_cards.insert(known_cards.end(), investigation_information[i].cards.begin(), investigation_information[i].cards.end());
+	}
+
+	struct set_rating
+	{
+		std::string suspect = "";
+		std::string room = "";
+		std::string weapon = "";
+		int rating = 0;
+	};
+
+	struct set_rating_sorting_functor
+	{
+		bool operator()(const set_rating& rating_1, const set_rating& rating_2)
+		{
+			return rating_1.rating > rating_2.rating;
+		}
+	};
+
+	std::vector<set_rating> sets;
+
+	player_cards own_cards;
+
+	for (unsigned int i = 0; i < investigation_information.size(); i++)
+	{
+		if (investigation_information[i].turn_order == 0)
+		{
+			own_cards = investigation_information[i];
+			break;
+		}
+	}
+
+	bool suspect_known = card_of_type_known(investigation_information, (int)cards::suspects.size(), &cards::is_suspect);
+	bool room_known = card_of_type_known(investigation_information, (int)cards::rooms.size(), &cards::is_room);
+	bool weapon_known = card_of_type_known(investigation_information, (int)cards::weapons.size(), &cards::is_weapon);
+
+	for (unsigned int i = 0; i < suspect_ratings.size(); i++)
+	{
+		for (unsigned int j = 0; j < room_ratings.size(); j++)
+		{
+			for (unsigned int k = 0; k < weapon_ratings.size(); k++)
+			{
+				int number_of_known_cards_in_set = 0;
+				if (suspect_known || card_present(known_cards, suspect_ratings[i].card))
+				{
+					number_of_known_cards_in_set++;
+				}
+
+				if (room_known || card_present(known_cards, room_ratings[j].card))
+				{
+					number_of_known_cards_in_set++;
+				}
+
+				if (weapon_known || card_present(known_cards, weapon_ratings[k].card))
+				{
+					number_of_known_cards_in_set++;
+				}
+
+				if (number_of_known_cards_in_set != 3)
+				{
+					set_rating new_rating;
+					new_rating.suspect = suspect_ratings[i].card;
+					new_rating.room = room_ratings[j].card;
+					new_rating.weapon = weapon_ratings[k].card;
+					new_rating.rating = suspect_ratings[i].rating + room_ratings[j].rating + weapon_ratings[k].rating;
+					sets.push_back(new_rating);
+				}
+			}
+		}
+	}
+
+	std::sort(sets.begin(), sets.end(), set_rating_sorting_functor());
+
+	std::string report = "Best Cards to Ask\nForm (Suspect, Room, Weapon) - Rating\n";
+
+	for (unsigned int i = 0; i < sets.size(); i++)
+	{
+		report = report + "(" + sets[i].suspect + ", " + sets[i].room + ", " + sets[i].weapon + ") - " + std::to_string(sets[i].rating) + "\n";
 	}
 
 	return report;
@@ -802,4 +895,116 @@ bool data::loaded_data_valid(const nlohmann::json& game_data)
 	}
 
 	return true;
+}
+
+std::vector<data::card_rating> data::rate_cards(const std::vector<std::string>& cards_to_rate, const std::vector<player_cards>& investigation_information)
+{
+	std::vector<card_rating> rated_cards;
+	for (unsigned int i = 0; i < cards_to_rate.size(); i++)
+	{
+		card_rating new_rating;
+		new_rating.card = cards_to_rate[i];
+		new_rating.rating = 0;
+		for (unsigned int j = 0; j < investigation_information.size(); j++)
+		{
+			bool card_found = false;
+			for (unsigned int k = 0; k < investigation_information[j].cards.size(); k++)
+			{
+				if (cards_to_rate[i] == investigation_information[j].cards[k])
+				{
+					if (investigation_information[j].turn_order != 0)
+					{
+						new_rating.rating = investigation_information[j].turn_order;
+					}
+					else
+					{
+						new_rating.rating = number_of_players;
+					}
+
+					card_found = true;
+					break;
+				}
+			}
+
+			if (card_found)
+			{
+				break;
+			}
+			else if (no_one_has_card(investigation_information, cards_to_rate[i]))
+			{
+				new_rating.rating = number_of_players;
+			}
+		}
+
+		rated_cards.push_back(new_rating);
+	}
+
+	return rated_cards;
+}
+
+bool data::card_of_type_known(const std::vector<player_cards>& investigation_information, int number_of_cards_in_type, bool (*is_card_type)(const std::string& card))
+{
+	bool known = false;
+	if (one_of_each_murder_element && investigation_information.size() > 0)
+	{
+		for (unsigned int i = 0; i < investigation_information[0].eliminated_cards.size(); i++)
+		{
+			if (is_card_type(investigation_information[0].eliminated_cards[i]))
+			{
+				known = no_one_has_card(investigation_information, investigation_information[0].eliminated_cards[i]);
+
+				if (known)
+				{
+					break;
+				}
+			}
+		}
+
+		if (!known)
+		{
+			int known_cards_count = 0;
+
+			for (unsigned int i = 0; i < investigation_information.size(); i++)
+			{
+				for (unsigned int j = 0; j < investigation_information[i].cards.size(); j++)
+				{
+					if (is_card_type(investigation_information[i].cards[j]))
+					{
+						known_cards_count++;
+					}
+				}
+			}
+
+			if (known_cards_count == number_of_cards_in_type - 1)
+			{
+				known = true;
+			}
+		}
+	}
+
+	return known;
+}
+
+bool data::no_one_has_card(const std::vector<player_cards>& investigation_information, const std::string& card)
+{
+	bool known = false;
+	for (unsigned int i = 0; i < investigation_information.size(); i++)
+	{
+		known = false;
+		for (unsigned int j = 0; j < investigation_information[i].eliminated_cards.size(); j++)
+		{
+			if (card == investigation_information[i].eliminated_cards[j])
+			{
+				known = true;
+				break;
+			}
+		}
+
+		if (!known)
+		{
+			break;
+		}
+	}
+
+	return known;
 }
