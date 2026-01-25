@@ -240,11 +240,13 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 
 	report_frame = report_display;
 	report_frame->enable_dec(true);
+	report_frame->set_selection_exit_keys({ascii_io::q});
 
 	report_board.use_spacing_width_multipliers(true);
 	report_board.set_width_multiplier(3.0f);
 	report_board.set_spacing_width_multipliers(1.0f, 0.5f);
 	report_board.set_lines_count(-1);
+	report_board.set_selectable(false);
 
 	report_board.add_configuration("has", -1, -1, "   V   ", '*');
 	report_board.add_configuration("hasn't", -1, -1, "   X   ", '*');
@@ -257,6 +259,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	investigation_suggestions_label.set_spacing(0, 3, 0, 0);
 	investigation_suggestions_label.set_lines_count(-25);
 	investigation_suggestions_label.set_title("Investigation Suggestions");
+	investigation_suggestions_label.set_selectable(true);
 
 	accusation_suggestions_label.add_border(true);
 	accusation_suggestions_label.use_spacing_width_multipliers(true);
@@ -265,6 +268,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	accusation_suggestions_label.set_spacing(0, 0, 0, 0);
 	accusation_suggestions_label.set_lines_count(10);
 	accusation_suggestions_label.set_title("Accusation Suggestions");
+	accusation_suggestions_label.set_selectable(true);
 
 	control_frame = control_display;
 	control_frame->enable_dec(true);
@@ -905,17 +909,17 @@ void display::display_overview(const std::vector<data::player_cards>& known_card
 
 	do
 	{
-		input = ascii_io::getchar();
+		input = report_frame->get_selection();
 
-		if (input == ascii_io::a)
+		if (input == accusation_suggestions_label)
 		{
 			accusation_suggestions_label.scroll();
 		}
-		else if (input == ascii_io::i)
+		else if (input == investigation_suggestions_label)
 		{
 			investigation_suggestions_label.scroll();
 		}
-	} while (input != ascii_io::q);
+	} while (!(report_frame->selection_exit_key_used() && input == ascii_io::q));
 }
 
 bool display::display_save(data& database)
