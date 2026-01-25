@@ -700,7 +700,6 @@ std::string data::generate_accusation_probability_report(const std::vector<playe
 
 std::string data::generate_investigation_report(const std::vector<player_cards>& investigation_information)
 {
-
 	std::vector<card_rating> suspect_ratings = rate_cards(cards::suspects, investigation_information);
 	std::vector<card_rating> room_ratings = rate_cards(cards::rooms, investigation_information);
 	std::vector<card_rating> weapon_ratings = rate_cards(cards::weapons, investigation_information);
@@ -716,6 +715,9 @@ std::string data::generate_investigation_report(const std::vector<player_cards>&
 		std::string suspect = "";
 		std::string room = "";
 		std::string weapon = "";
+		bool target_suspect = false;
+		bool target_room = false;
+		bool target_weapon = false;
 		int rating = 0;
 	};
 
@@ -751,24 +753,36 @@ std::string data::generate_investigation_report(const std::vector<player_cards>&
 			for (unsigned int k = 0; k < weapon_ratings.size(); k++)
 			{
 				int number_of_known_cards_in_set = 0;
+				set_rating new_rating;
 				if (suspect_known || card_present(known_cards, suspect_ratings[i].card))
 				{
 					number_of_known_cards_in_set++;
+				}
+				else
+				{
+					new_rating.target_suspect = true;
 				}
 
 				if (room_known || card_present(known_cards, room_ratings[j].card))
 				{
 					number_of_known_cards_in_set++;
 				}
+				else
+				{
+					new_rating.target_room = true;
+				}
 
 				if (weapon_known || card_present(known_cards, weapon_ratings[k].card))
 				{
 					number_of_known_cards_in_set++;
 				}
+				else
+				{
+					new_rating.target_weapon = true;
+				}
 
 				if (number_of_known_cards_in_set != 3)
 				{
-					set_rating new_rating;
 					new_rating.suspect = suspect_ratings[i].card;
 					new_rating.room = room_ratings[j].card;
 					new_rating.weapon = weapon_ratings[k].card;
@@ -781,11 +795,40 @@ std::string data::generate_investigation_report(const std::vector<player_cards>&
 
 	std::sort(sets.begin(), sets.end(), set_rating_sorting_functor());
 
-	std::string report = "Best Cards to Ask\nForm (Suspect, Room, Weapon) - Rating\n";
+	std::string report = "Best Cards to Ask\nForm (Suspect, Room, Weapon) - Rating - Targeted Cards: ()\n";
 
 	for (unsigned int i = 0; i < sets.size(); i++)
 	{
-		report = report + "(" + sets[i].suspect + ", " + sets[i].room + ", " + sets[i].weapon + ") - " + std::to_string(sets[i].rating) + "\n";
+		report = report + "(" + sets[i].suspect + ", " + sets[i].room + ", " + sets[i].weapon + ") - " + std::to_string(sets[i].rating) + " - Targeted Cards: (";
+		bool first_card = true;
+		if (sets[i].target_suspect)
+		{
+			report = report + sets[i].suspect;
+			first_card = false;
+		}
+
+		if (sets[i].target_room)
+		{
+			if (!first_card)
+			{
+				report = report + ", ";
+			}
+
+			report = report + sets[i].room;
+			first_card = false;
+		}
+
+		if (sets[i].target_weapon)
+		{
+			if (!first_card)
+			{
+				report = report + ", ";
+			}
+
+			report = report + sets[i].weapon;
+		}
+
+		report = report + ")\n";
 	}
 
 	return report;
