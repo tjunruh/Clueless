@@ -710,17 +710,6 @@ std::string data::generate_investigation_report(const std::vector<player_cards>&
 		known_cards.insert(known_cards.end(), investigation_information[i].cards.begin(), investigation_information[i].cards.end());
 	}
 
-	struct set_rating
-	{
-		std::string suspect = "";
-		std::string room = "";
-		std::string weapon = "";
-		bool target_suspect = false;
-		bool target_room = false;
-		bool target_weapon = false;
-		int rating = 0;
-	};
-
 	struct set_rating_sorting_functor
 	{
 		bool operator()(const set_rating& rating_1, const set_rating& rating_2)
@@ -742,9 +731,9 @@ std::string data::generate_investigation_report(const std::vector<player_cards>&
 		}
 	}
 
-	bool suspect_known = card_of_type_known(investigation_information, (int)cards::suspects.size(), &cards::is_suspect);
-	bool room_known = card_of_type_known(investigation_information, (int)cards::rooms.size(), &cards::is_room);
-	bool weapon_known = card_of_type_known(investigation_information, (int)cards::weapons.size(), &cards::is_weapon);
+	bool global_suspect_known = card_of_type_known(investigation_information, (int)cards::suspects.size(), &cards::is_suspect);
+	bool global_room_known = card_of_type_known(investigation_information, (int)cards::rooms.size(), &cards::is_room);
+	bool global_weapon_known = card_of_type_known(investigation_information, (int)cards::weapons.size(), &cards::is_weapon);
 
 	for (unsigned int i = 0; i < suspect_ratings.size(); i++)
 	{
@@ -754,7 +743,8 @@ std::string data::generate_investigation_report(const std::vector<player_cards>&
 			{
 				int number_of_known_cards_in_set = 0;
 				set_rating new_rating;
-				if (suspect_known || card_present(known_cards, suspect_ratings[i].card))
+				new_rating.suspect_unknown = !card_present(known_cards, suspect_ratings[i].card);
+				if (global_suspect_known || !new_rating.suspect_unknown)
 				{
 					number_of_known_cards_in_set++;
 				}
@@ -763,7 +753,8 @@ std::string data::generate_investigation_report(const std::vector<player_cards>&
 					new_rating.target_suspect = true;
 				}
 
-				if (room_known || card_present(known_cards, room_ratings[j].card))
+				new_rating.room_unknown = !card_present(known_cards, room_ratings[j].card);
+				if (global_room_known || !new_rating.room_unknown)
 				{
 					number_of_known_cards_in_set++;
 				}
@@ -772,7 +763,8 @@ std::string data::generate_investigation_report(const std::vector<player_cards>&
 					new_rating.target_room = true;
 				}
 
-				if (weapon_known || card_present(known_cards, weapon_ratings[k].card))
+				new_rating.weapon_unknown = !card_present(known_cards, weapon_ratings[k].card);
+				if (global_weapon_known || !new_rating.weapon_unknown)
 				{
 					number_of_known_cards_in_set++;
 				}
@@ -786,7 +778,7 @@ std::string data::generate_investigation_report(const std::vector<player_cards>&
 					new_rating.suspect = suspect_ratings[i].card;
 					new_rating.room = room_ratings[j].card;
 					new_rating.weapon = weapon_ratings[k].card;
-					new_rating.rating = suspect_ratings[i].rating + room_ratings[j].rating + weapon_ratings[k].rating;
+					new_rating.rating = suspect_ratings[i].rating + room_ratings[j].rating + weapon_ratings[k].rating + get_number_of_potential_set_completions(new_rating, investigation_information);
 					sets.push_back(new_rating);
 				}
 			}
@@ -1050,4 +1042,82 @@ bool data::no_one_has_card(const std::vector<player_cards>& investigation_inform
 	}
 
 	return known;
+}
+
+int data::get_number_of_potential_set_completions(const set_rating& set, const std::vector<player_cards>& investigation_information)
+{
+	int set_completions = 0;
+	for (unsigned int i = 0; i < turn_history.size(); i++)
+	{
+		if (!turn_skipped(turn_history[i]) && ((set.suspect_unknown && set.suspect == turn_history[i].suspect) || (set.room_unknown && set.room == turn_history[i].room) || (set.weapon_unknown && set.weapon == turn_history[i].weapon)))
+		{
+			int number_of_cards_known_in_set = 0;
+			for (unsigned int j = 0; j < investigation_information.size(); j++)
+			{
+				if (investigation_information[j].turn_order != turn_history[i].answering_player_turn_order)
+				{
+					if (((set.room_unknown || set.weapon_unknown) && !set.suspect_unknown) && card_present(investigation_information[j].cards, turn_history[i].suspect))
+					{
+						number_of_cards_known_in_set++;
+					}
+
+					if (((set.suspect_unknown || set.weapon_unknown) && !set.room_unknown) && card_present(investigation_information[j].cards, turn_history[i].room))
+					{
+						number_of_cards_known_in_set++;
+					}
+
+					if (((set.suspect_unknown || set.room_unknown) && !set.weapon_unknown) && card_present(investigation_information[j].cards, turn_history[i].weapon))
+					{
+						number_of_cards_known_in_set++;
+					}
+				}
+				else
+				{
+					if (((set.room_unknown || set.weapon_unknown) && !set.suspect_unknown) && card_present(investigation_information[j].eliminated_cards, turn_history[i].suspect))
+					{
+						number_of_cards_known_in_set++;
+					}
+
+					if (((set.suspect_unknown || set.weapon_unknown) && !set.room_unknown) && card_present(investigation_information[j].eliminated_cards, turn_history[i].room))
+					{
+						number_of_cards_known_in_set++;
+					}
+
+					if (((set.suspect_unknown || set.room_unknown) && !set.weapon_unknown) && card_present(investigation_information[j].eliminated_cards, turn_history[i].weapon))
+					{
+						number_of_cards_known_in_set++;
+					}
+				}
+			}
+
+			if (number_of_cards_known_in_set == 1)
+			{
+				set_completions++;
+			}
+		}
+	}
+
+	int number_of_unknown_cards = 0;
+
+	if (set.suspect_unknown)
+	{
+		number_of_unknown_cards++;
+	}
+
+	if (set.room_unknown)
+	{
+		number_of_unknown_cards++;
+	}
+
+	if (set.weapon_unknown)
+	{
+		number_of_unknown_cards++;
+	}
+
+	if (number_of_unknown_cards != 0)
+	{
+		set_completions = set_completions / number_of_unknown_cards;
+	}
+
+	return set_completions;
 }

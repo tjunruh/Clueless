@@ -32,6 +32,20 @@ public:
 		int rating = 100;
 	};
 
+	struct set_rating
+	{
+		std::string suspect = "";
+		std::string room = "";
+		std::string weapon = "";
+		bool target_suspect = false;
+		bool target_room = false;
+		bool target_weapon = false;
+		bool suspect_unknown = false;
+		bool room_unknown = false;
+		bool weapon_unknown = false;
+		int rating = 0;
+	};
+
 	void set_number_of_players(int number);
 	int get_number_of_players();
 	void set_player_name(const std::string& name, int turn_order);
@@ -73,6 +87,7 @@ private:
 	std::vector<card_rating> rate_cards(const std::vector<std::string>& cards_to_rate, const std::vector<player_cards>& investigation_information);
 	bool card_of_type_known(const std::vector<player_cards>& investigation_information, int number_of_cards_in_type, bool (*is_card_type)(const std::string& card));
 	bool no_one_has_card(const std::vector<player_cards>& investigation_information, const std::string& card);
+	int get_number_of_potential_set_completions(const set_rating& set, const std::vector<player_cards>& investigation_information);
 
 	struct player_name_turn_order_container
 	{
