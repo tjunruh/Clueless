@@ -28,7 +28,6 @@ $(EXECUTABLE): $(OBJS)
 	mv $(EXECUTABLE) $(BLD_DIR)/bin
 	cp external_libraries/$(ASCII_ENGINE_DIR)/Linux/libascii_engine.so $(BLD_DIR)/bin
 	cp -r board_configs $(BLD_DIR)/bin
-	rm -rf $(BLD_DIR)/Code
 	cp Clueless.sh $(BLD_DIR)
 
 $(BLD_DIR)/%.cpp.o: %.cpp
