@@ -37,7 +37,8 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	load_menu(load_display),
 
 	own_cards_entry_menu(own_cards_entry_display),
-	own_cards_entered_menu(own_cards_entry_display)
+	own_cards_entered_menu(own_cards_entry_display),
+	own_cards_instructions_label(own_cards_entry_display, "merge")
 {
 	initialization_frame = initialization_display;
 	initialization_frame->enable_dec(true);
@@ -339,10 +340,17 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	own_cards_entered_menu.set_width_multiplier(3.0f);
 	own_cards_entered_menu.set_spacing_width_multipliers(0.5f, 1.0f);
 	own_cards_entered_menu.set_spacing(2, 0, 0, 0);
-	own_cards_entered_menu.set_lines_count(-6);
+	own_cards_entered_menu.set_lines_count(-13);
 	own_cards_entered_menu.set_cursor(' ');
 	own_cards_entered_menu.set_title("Entered Cards");
 	own_cards_entered_menu.build();
+
+	own_cards_instructions_label.add_border(true);
+	own_cards_instructions_label.use_spacing_width_multipliers(true);
+	own_cards_instructions_label.set_width_multiplier(3.0f);
+	own_cards_instructions_label.set_spacing_width_multipliers(0.5f, 1.0f);
+	own_cards_instructions_label.set_spacing(2, 0, 0, 0);
+	own_cards_instructions_label.set_output("Select Card: Enter\nRemove Card: Delete\nExit and Save: q");
 }
 
 bool display::display_setup(data& database)

@@ -246,5 +246,6 @@ private:
 
 	menu own_cards_entry_menu;
 	menu own_cards_entered_menu;
+	label own_cards_instructions_label;
 	frame* own_cards_entry_frame;
 };
