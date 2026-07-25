@@ -5,7 +5,7 @@ EXECUTABLE ?= clueless
 
 SRC_DIR ?= Code
 BLD_DIR ?= build
-ASCII_ENGINE_DIR ?= ASCII_Board_Game_Engine_v1.0.0
+ASCII_ENGINE_DIR ?= ASCII_Board_Game_Engine_v1.1.0
 INC_DIR := $(shell find $(SRC_DIR) -type d)
 
 SRCS := $(shell find $(SRC_DIR) -name *.cpp)
