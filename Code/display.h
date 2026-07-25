@@ -5,6 +5,7 @@
 #include <ascii_engine/text_box.h>
 #include <ascii_engine/menu.h>
 #include <ascii_engine/ascii_board.h>
+#include <ascii_engine/console.h>
 #include "data.h"
 #include "cards.h"
 
@@ -217,6 +218,7 @@ private:
 	label cancel_label;
 	label ok_label;
 	frame* initialization_frame;
+	console initialization_console;
 
 	label round_label;
 	label asking_player_label;
@@ -229,11 +231,13 @@ private:
 	label lock_unlock_label;
 	label forward_label;
 	frame* turn_entry_frame;
+	console turn_entry_console;
 
 	ascii_board report_board;
 	label investigation_suggestions_label;
 	label accusation_suggestions_label;
 	frame* report_frame;
+	console report_console;
 
 	menu control_menu;
 	frame* control_frame;

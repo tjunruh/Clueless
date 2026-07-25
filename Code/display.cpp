@@ -50,6 +50,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	number_of_players_text_box.set_spacing(6, 3, 0, 0);
 	number_of_players_text_box.set_title("Enter Number of Players (2-6)");
 	number_of_players_text_box.set_max_characters(1);
+	initialization_console.register_widget(&number_of_players_text_box);
 
 	your_name_text_box.add_border(true);
 	your_name_text_box.use_spacing_width_multipliers(true);
@@ -57,6 +58,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	your_name_text_box.set_spacing_width_multipliers(1.0f, 0.5f);
 	your_name_text_box.set_spacing(0, 3, 0, 0);
 	your_name_text_box.set_title("Enter Your Name");
+	initialization_console.register_widget(&your_name_text_box);
 
 	one_of_each_murder_element_menu.add_border(true);
 	one_of_each_murder_element_menu.use_spacing_width_multipliers(true);
@@ -66,6 +68,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	one_of_each_murder_element_menu.append_item("Yes");
 	one_of_each_murder_element_menu.append_item("No");
 	one_of_each_murder_element_menu.build();
+	initialization_console.register_widget(&one_of_each_murder_element_menu);
 
 	players_names_label.set_output("Enter Your Opponents's Names in Turn Order After You");
 	players_names_label.set_alignment("center");
@@ -79,30 +82,35 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	player_2_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_2_name_text_box.set_spacing(0, 1, 0, 0);
 	player_2_name_text_box.set_selectable(false);
+	initialization_console.register_widget(&player_2_name_text_box);
 	
 	player_3_name_text_box.use_spacing_width_multipliers(true);
 	player_3_name_text_box.set_width_multiplier(3.0f);
 	player_3_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_3_name_text_box.set_spacing(0, 1, 0, 0);
 	player_3_name_text_box.set_selectable(false);
+	initialization_console.register_widget(&player_3_name_text_box);
 
 	player_4_name_text_box.use_spacing_width_multipliers(true);
 	player_4_name_text_box.set_width_multiplier(3.0f);
 	player_4_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_4_name_text_box.set_spacing(0, 1, 0, 0);
 	player_4_name_text_box.set_selectable(false);
+	initialization_console.register_widget(&player_4_name_text_box);
 
 	player_5_name_text_box.use_spacing_width_multipliers(true);
 	player_5_name_text_box.set_width_multiplier(3.0f);
 	player_5_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_5_name_text_box.set_spacing(0, 1, 0, 0);
 	player_5_name_text_box.set_selectable(false);
+	initialization_console.register_widget(&player_5_name_text_box);
 
 	player_6_name_text_box.use_spacing_width_multipliers(true);
 	player_6_name_text_box.set_width_multiplier(3.0f);
 	player_6_name_text_box.set_spacing_width_multipliers(0.5f, 1.0f);
 	player_6_name_text_box.set_spacing(0, 1, 0, 0);
 	player_6_name_text_box.set_selectable(false);
+	initialization_console.register_widget(&player_6_name_text_box);
 
 	cancel_label.set_output("Cancel");
 	cancel_label.add_border(true);
@@ -111,6 +119,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	cancel_label.set_spacing_width_multipliers(0.5f, 2.0f);
 	cancel_label.set_spacing(6, 0, 0, 0);
 	cancel_label.set_selectable(true);
+	initialization_console.register_widget(&cancel_label);
 
 	ok_label.set_output("Ok");
 	ok_label.add_border(true);
@@ -119,6 +128,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	ok_label.set_spacing_width_multipliers(2.0f, 0.5f);
 	ok_label.set_spacing(6, 0, 0, 0);
 	ok_label.set_selectable(true);
+	initialization_console.register_widget(&ok_label);
 
 	turn_entry_frame = turn_entry_display;
 	turn_entry_frame->enable_dec(true);
@@ -156,6 +166,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	suspect_menu.enable_quit(true);
 	suspect_menu.set_title("Suspect");
 	suspect_menu.build();
+	turn_entry_console.register_widget(&suspect_menu);
 
 	room_menu.append_item("None");
 	room_menu.append_item(cards::hall);
@@ -175,6 +186,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	room_menu.enable_quit(true);
 	room_menu.set_title("Room");
 	room_menu.build();
+	turn_entry_console.register_widget(&room_menu);
 
 	weapon_menu.append_item("None");
 	weapon_menu.append_item(cards::knife);
@@ -191,6 +203,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	weapon_menu.enable_quit(true);
 	weapon_menu.set_title("Weapon");
 	weapon_menu.build();
+	turn_entry_console.register_widget(&weapon_menu);
 
 	answering_player_menu.append_item("None");
 	answering_player_menu.add_border(true);
@@ -201,6 +214,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	answering_player_menu.enable_quit(true);
 	answering_player_menu.set_title("Ansering Player");
 	answering_player_menu.build();
+	turn_entry_console.register_widget(&answering_player_menu);
 
 	known_card_menu.append_item("None");
 	known_card_menu.add_border(true);
@@ -211,6 +225,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	known_card_menu.set_spacing(0, 2, 0, 0);
 	known_card_menu.set_title("Known Cards");
 	known_card_menu.build();
+	turn_entry_console.register_widget(&known_card_menu);
 
 	back_label.set_output("<-- Back");
 	back_label.set_alignment("center");
@@ -220,6 +235,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	back_label.set_spacing_width_multipliers(0.5f, 0.5f);
 	back_label.set_spacing(2, 0, 0, 0);
 	back_label.set_selectable(true);
+	turn_entry_console.register_widget(&back_label);
 
 	lock_unlock_label.set_output("lock");
 	lock_unlock_label.set_alignment("center");
@@ -229,6 +245,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	lock_unlock_label.set_spacing_width_multipliers(0.5f, 0.5f);
 	lock_unlock_label.set_spacing(2, 0, 0, 0);
 	lock_unlock_label.set_selectable(true);
+	turn_entry_console.register_widget(&lock_unlock_label);
 
 	forward_label.set_output("Forward -->");
 	forward_label.set_alignment("center");
@@ -238,6 +255,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	forward_label.set_spacing_width_multipliers(0.5f, 0.5f);
 	forward_label.set_spacing(2, 0, 0, 0);
 	forward_label.set_selectable(true);
+	turn_entry_console.register_widget(&forward_label);
 
 	report_frame = report_display;
 	report_frame->enable_dec(true);
@@ -252,6 +270,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	report_board.add_configuration("has", -1, -1, "   V   ", '*');
 	report_board.add_configuration("hasn't", -1, -1, "   X   ", '*');
 	report_board.build();
+	report_console.register_widget(&report_board);
 
 	investigation_suggestions_label.add_border(true);
 	investigation_suggestions_label.use_spacing_width_multipliers(true);
@@ -261,6 +280,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	investigation_suggestions_label.set_lines_count(-25);
 	investigation_suggestions_label.set_title("Investigation Suggestions");
 	investigation_suggestions_label.set_selectable(true);
+	report_console.register_widget(&investigation_suggestions_label);
 
 	accusation_suggestions_label.add_border(true);
 	accusation_suggestions_label.use_spacing_width_multipliers(true);
@@ -270,6 +290,7 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 	accusation_suggestions_label.set_lines_count(10);
 	accusation_suggestions_label.set_title("Accusation Suggestions");
 	accusation_suggestions_label.set_selectable(true);
+	report_console.register_widget(&accusation_suggestions_label);
 
 	control_frame = control_display;
 	control_frame->enable_dec(true);
@@ -355,7 +376,6 @@ display::display(frame* initialization_display, frame* turn_entry_display, frame
 
 bool display::display_setup(data& database)
 {
-	int selection = ascii_io::undefined;
 	std::string number_of_players_text = "";
 	int number_of_players = 0;
 	std::string player_name = "";
@@ -374,16 +394,13 @@ bool display::display_setup(data& database)
 		one_of_each_murder_element_menu.set_cursor_index(1);
 	}
 
-	initialization_frame->display();
-
 	do
 	{
-		selection = initialization_frame->get_selection();
+		console::event event = initialization_console.run();
 
-		if (selection == number_of_players_text_box)
+		if (event.widget_id == number_of_players_text_box)
 		{
-			int exit_code = number_of_players_text_box.write();
-			if (exit_code == ascii_io::enter)
+			if (event.input == ascii_io::enter || event.input == ascii_io::exited_widget)
 			{
 				number_of_players_text = number_of_players_text_box.get_text();
 				if (is_number(number_of_players_text))
@@ -394,10 +411,10 @@ bool display::display_setup(data& database)
 						number_of_players = 0;
 						number_of_players_text_box.clear();
 					}
-					else
+					else if (event.input == ascii_io::enter)
 					{
 						render_name_text_boxes(number_of_players);
-						initialization_frame->set_selection(your_name_text_box);
+						initialization_console.set_focus(your_name_text_box);
 					}
 				}
 				else
@@ -405,14 +422,22 @@ bool display::display_setup(data& database)
 					number_of_players_text_box.clear();
 				}
 			}
-
-			ascii_io::hide_cursor();
 		}
-		else if (selection == your_name_text_box)
+		else if (event.widget_id == one_of_each_murder_element_menu)
 		{
-			int exit_code = your_name_text_box.write();
-			ascii_io::hide_cursor();
-			if (exit_code == ascii_io::enter)
+			std::string selection = one_of_each_murder_element_menu.get_selection();
+			if (selection == "Yes")
+			{
+				database.set_one_of_each_murder_element(true);
+			}
+			else if (selection == "No")
+			{
+				database.set_one_of_each_murder_element(false);
+			}
+		}
+		else if (event.widget_id == your_name_text_box)
+		{
+			if (event.input == ascii_io::enter || event.input == ascii_io::exited_widget)
 			{
 				player_name = your_name_text_box.get_text();
 				if (name_present(player_name, {player_2_name, player_3_name, player_4_name, player_5_name, player_6_name}))
@@ -420,38 +445,19 @@ bool display::display_setup(data& database)
 					player_name = "";
 					your_name_text_box.clear();
 				}
-				else
+				else if (event.input == ascii_io::enter)
 				{
-					initialization_frame->set_selection(player_2_name_text_box);
+					initialization_console.set_focus(player_2_name_text_box);
 				}
 			}
-			else
+			else if (event.input == ascii_io::DEL || event.input == ascii_io::ESC)
 			{
 				your_name_text_box.clear();
 			}
 		}
-		else if (selection == one_of_each_murder_element_menu)
+		else if (event.widget_id == player_2_name_text_box)
 		{
-			std::string selection = "";
-			int key_stroke = ascii_io::undefined;
-			one_of_each_murder_element_menu.get_selection(selection, key_stroke);
-			if (key_stroke == ascii_io::enter)
-			{
-				if (selection == "Yes")
-				{
-					database.set_one_of_each_murder_element(true);
-				}
-				else if (selection == "No")
-				{
-					database.set_one_of_each_murder_element(false);
-				}
-			}
-		}
-		else if (selection == player_2_name_text_box)
-		{
-			int exit_code = player_2_name_text_box.write();
-			ascii_io::hide_cursor();
-			if (exit_code == ascii_io::enter)
+			if (event.input == ascii_io::enter || event.input == ascii_io::exited_widget)
 			{
 				player_2_name = player_2_name_text_box.get_text();
 				if (name_present(player_2_name, {player_name, player_3_name, player_4_name, player_5_name, player_6_name}))
@@ -459,28 +465,26 @@ bool display::display_setup(data& database)
 					player_2_name = "";
 					player_2_name_text_box.clear();
 				}
-				else
+				else if (event.input == ascii_io::enter)
 				{
 					if (number_of_players > 2)
 					{
-						initialization_frame->set_selection(player_3_name_text_box);
+						initialization_console.set_focus(player_3_name_text_box);
 					}
 					else
 					{
-						initialization_frame->set_selection(ok_label);
+						initialization_console.set_focus(ok_label);
 					}
 				}
 			}
-			else
+			else if (event.input == ascii_io::DEL || event.input == ascii_io::ESC)
 			{
 				player_2_name_text_box.clear();
 			}
 		}
-		else if (selection == player_3_name_text_box)
+		else if (event.widget_id == player_3_name_text_box)
 		{
-			int exit_code = player_3_name_text_box.write();
-			ascii_io::hide_cursor();
-			if (exit_code == ascii_io::enter)
+			if (event.input == ascii_io::enter || event.input == ascii_io::exited_widget)
 			{
 				player_3_name = player_3_name_text_box.get_text();
 				if (name_present(player_3_name, {player_2_name, player_name, player_4_name, player_5_name, player_6_name}))
@@ -488,28 +492,26 @@ bool display::display_setup(data& database)
 					player_3_name = "";
 					player_3_name_text_box.clear();
 				}
-				else
+				else if (event.input == ascii_io::enter)
 				{
 					if (number_of_players > 3)
 					{
-						initialization_frame->set_selection(player_4_name_text_box);
+						initialization_console.set_focus(player_4_name_text_box);
 					}
 					else
 					{
-						initialization_frame->set_selection(ok_label);
+						initialization_console.set_focus(ok_label);
 					}
 				}
 			}
-			else
+			else if (event.input == ascii_io::DEL || event.input == ascii_io::ESC)
 			{
 				player_3_name_text_box.clear();
 			}
 		}
-		else if (selection == player_4_name_text_box)
+		else if (event.widget_id == player_4_name_text_box)
 		{
-			int exit_code = player_4_name_text_box.write();
-			ascii_io::hide_cursor();
-			if (exit_code == ascii_io::enter)
+			if (event.input == ascii_io::enter || event.input == ascii_io::exited_widget)
 			{
 				player_4_name = player_4_name_text_box.get_text();
 				if (name_present(player_4_name, {player_2_name, player_3_name, player_name, player_5_name, player_6_name}))
@@ -517,28 +519,26 @@ bool display::display_setup(data& database)
 					player_4_name = "";
 					player_4_name_text_box.clear();
 				}
-				else
+				else if (event.input == ascii_io::enter)
 				{
 					if (number_of_players > 4)
 					{
-						initialization_frame->set_selection(player_5_name_text_box);
+						initialization_console.set_focus(player_5_name_text_box);
 					}
 					else
 					{
-						initialization_frame->set_selection(ok_label);
+						initialization_console.set_focus(ok_label);
 					}
 				}
 			}
-			else
+			else if (event.input == ascii_io::DEL || event.input == ascii_io::ESC)
 			{
 				player_4_name_text_box.clear();
 			}
 		}
-		else if (selection == player_5_name_text_box)
+		else if (event.widget_id == player_5_name_text_box)
 		{
-			int exit_code = player_5_name_text_box.write();
-			ascii_io::hide_cursor();
-			if (exit_code == ascii_io::enter)
+			if (event.input == ascii_io::enter || event.input == ascii_io::exited_widget)
 			{
 				player_5_name = player_5_name_text_box.get_text();
 				if (name_present(player_5_name, {player_2_name, player_3_name, player_4_name, player_name, player_6_name}))
@@ -550,24 +550,22 @@ bool display::display_setup(data& database)
 				{
 					if (number_of_players > 5)
 					{
-						initialization_frame->set_selection(player_6_name_text_box);
+						initialization_console.set_focus(player_6_name_text_box);
 					}
-					else
+					else if (event.input == ascii_io::enter)
 					{
-						initialization_frame->set_selection(ok_label);
+						initialization_console.set_focus(ok_label);
 					}
 				}
 			}
-			else
+			else if (event.input == ascii_io::DEL || event.input == ascii_io::ESC)
 			{
 				player_5_name_text_box.clear();
 			}
 		}
-		else if (selection == player_6_name_text_box)
+		else if (event.widget_id == player_6_name_text_box)
 		{
-			int exit_code = player_6_name_text_box.write();
-			ascii_io::hide_cursor();
-			if (exit_code == ascii_io::enter)
+			if (event.input == ascii_io::enter || event.input == ascii_io::exited_widget)
 			{
 				player_6_name = player_6_name_text_box.get_text();
 				if (name_present(player_6_name, {player_2_name, player_3_name, player_4_name, player_5_name, player_name}))
@@ -575,22 +573,22 @@ bool display::display_setup(data& database)
 					player_6_name = "";
 					player_6_name_text_box.clear();
 				}
-				else
+				else if (event.input == ascii_io::enter)
 				{
-					initialization_frame->set_selection(ok_label);
+					initialization_console.set_focus(ok_label);
 				}
 			}
-			else
+			else if (event.input == ascii_io::DEL || event.input == ascii_io::ESC)
 			{
 				player_6_name = player_6_name_text_box.get_text();
 			}
 		}
-		else if (selection == cancel_label)
+		else if (event.widget_id == cancel_label && event.input == ascii_io::mouse_left_released)
 		{
 			setup_completed = false;
 			break;
 		}
-		else if (selection == ok_label)
+		else if (event.widget_id == ok_label && event.input == ascii_io::mouse_left_released)
 		{
 			if (number_of_players != 0)
 			{
@@ -711,35 +709,42 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 		weapon_menu.set_cursor_index(0);
 		answering_player_menu.set_cursor_index(0);
 		lock_unlock_label.set_output("lock");
-		turn_entry_frame->set_selection(suspect_menu);
 		known_card_menu.remove_all_items();
 		known_card_menu.append_item("None");
 		known_card_menu.build();
 	}
 
-	int selection = ascii_io::undefined;
-
 	do
 	{
-		selection = turn_entry_frame->get_selection();
+		console::event event = turn_entry_console.run();
 
-		if (selection == back_label)
+		if (event.widget_id == back_label && event.input == ascii_io::mouse_left_released)
 		{
 			feedback = backward;
 			break;
 		}
-		else if (selection == lock_unlock_label)
+		else if (event.widget_id == lock_unlock_label && event.input == ascii_io::mouse_left_released)
 		{
 			if (lock_unlock_label.get_output() == "lock")
 			{
 				lock_unlock_label.set_output("unlock");
+				suspect_menu.set_selectable(false);
+				room_menu.set_selectable(false);
+				weapon_menu.set_selectable(false);
+				answering_player_menu.set_selectable(false);
+				known_card_menu.set_selectable(false);
 			}
 			else if (lock_unlock_label.get_output() == "unlock")
 			{
 				lock_unlock_label.set_output("lock");
+				suspect_menu.set_selectable(true);
+				room_menu.set_selectable(true);
+				weapon_menu.set_selectable(true);
+				answering_player_menu.set_selectable(true);
+				known_card_menu.set_selectable(true);
 			}
 		}
-		else if (selection == forward_label)
+		else if (event.widget_id == forward_label && event.input == ascii_io::mouse_left_released)
 		{
 			if ((suspect != "None" && room != "None" && weapon != "None" && (asking_player_turn_order != 0 || answering_player_name == "None" || known_card != "None")) || (suspect == "None" && room == "None" && weapon == "None" && answering_player_name == "None" && (asking_player_turn_order != 0 || known_card == "None")))
 			{
@@ -757,125 +762,75 @@ display::turn_entry_feedback display::display_turn_entry(data& database, int rou
 				break;
 			}
 		}
-		else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::o)
+		else if (event.input == ascii_io::o)
 		{
 			display_overview(database.investigate(), database);
 			ascii_io::zoom_to_level(0, 300);
 			turn_entry_frame->display();
 		}
-		else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::s)
+		else if (event.input == ascii_io::s)
 		{
 			feedback = save;
 			break;
 		}
-		else if (turn_entry_frame->selection_exit_key_used() && selection == ascii_io::e)
+		else if (event.input == ascii_io::e)
 		{
 			feedback = entry;
 			break;
 		}
-		else if (lock_unlock_label.get_output() == "lock")
+		else if (event.widget_id == suspect_menu || event.widget_id == room_menu || event.widget_id == weapon_menu)
 		{
-			if (selection == suspect_menu)
+			unsigned int known_card_menu_cursor_index = known_card_menu.get_cursor_index();
+			if (suspect != "None")
 			{
-				int key_stroke = ascii_io::undefined;
-				suspect_menu.get_selection(suspect, key_stroke);
-				if (key_stroke != ascii_io::enter)
-				{
-					suspect = "None";
-					suspect_menu.set_cursor_index(0);
-				}
-				else
-				{
-					turn_entry_frame->set_selection(room_menu);
-				}
+				known_card_menu.remove_item(suspect);
+			}
 
-				if (asking_player_turn_order == 0 && suspect != "None" && room != "None" && weapon != "None")
-				{
-					known_card_menu.append_item(suspect);
-					known_card_menu.append_item(room);
-					known_card_menu.append_item(weapon);
-					known_card_menu.build();
-				}
-			}
-			else if (selection == room_menu)
+			if (room != "None")
 			{
-				int key_stroke = ascii_io::undefined;
-				room_menu.get_selection(room, key_stroke);
-				if (key_stroke != ascii_io::enter)
-				{
-					room = "None";
-					room_menu.set_cursor_index(0);
-				}
-				else
-				{
-					turn_entry_frame->set_selection(weapon_menu);
-				}
+				known_card_menu.remove_item(room);
+			}
 
-				if (asking_player_turn_order == 0 && suspect != "None" && room != "None" && weapon != "None")
-				{
-					known_card_menu.append_item(suspect);
-					known_card_menu.append_item(room);
-					known_card_menu.append_item(weapon);
-					known_card_menu.build();
-				}
-			}
-			else if (selection == weapon_menu)
+			if (weapon != "None")
 			{
-				int key_stroke = ascii_io::undefined;
-				weapon_menu.get_selection(weapon, key_stroke);
-				if (key_stroke != ascii_io::enter)
-				{
-					weapon = "None";
-					weapon_menu.set_cursor_index(0);
-				}
-				else
-				{
-					turn_entry_frame->set_selection(answering_player_menu);
-				}
+				known_card_menu.remove_item(weapon);
+			}
 
-				if (asking_player_turn_order == 0 && suspect != "None" && room != "None" && weapon != "None")
-				{
-					known_card_menu.append_item(suspect);
-					known_card_menu.append_item(room);
-					known_card_menu.append_item(weapon);
-					known_card_menu.build();
-				}
-			}
-			else if (selection == answering_player_menu)
+
+			if (event.widget_id == suspect_menu)
 			{
-				int key_stroke = ascii_io::undefined;
-				answering_player_menu.get_selection(answering_player_name, key_stroke);
-				if (key_stroke != ascii_io::enter)
-				{
-					answering_player_name = "None";
-					answering_player_menu.set_cursor_index(0);
-				}
-				else
-				{
-					if (asking_player_turn_order != 0)
-					{
-						turn_entry_frame->set_selection(forward_label);
-					}
-					else
-					{
-						turn_entry_frame->set_selection(known_card_menu);
-					}
-				}
+				suspect = suspect_menu.get_selection();
 			}
-			else if (selection == known_card_menu && asking_player_turn_order == 0)
+			else if (event.widget_id == room_menu)
 			{
-				int key_stroke = ascii_io::undefined;
-				known_card_menu.get_selection(known_card, key_stroke);
-				if (key_stroke != ascii_io::enter)
-				{
-					known_card = "None";
-					known_card_menu.set_cursor_index(0);
-				}
-				else
-				{
-					turn_entry_frame->set_selection(forward_label);
-				}
+				room = room_menu.get_selection();
 			}
+			else if (event.widget_id == weapon_menu)
+			{
+				weapon = weapon_menu.get_selection();
+			}
+
+			if (asking_player_turn_order == 0 && suspect != "None" && room != "None" && weapon != "None")
+			{
+				known_card_menu.append_item(suspect);
+				known_card_menu.append_item(room);
+				known_card_menu.append_item(weapon);
+				known_card_menu.set_cursor_index(known_card_menu_cursor_index);
+			}
+			else
+			{
+				known_card_menu.set_cursor_index(0);
+			}
+
+			known_card_menu.build();
+		}
+		else if (event.widget_id == answering_player_menu)
+		{
+			answering_player_name = answering_player_menu.get_selection();
+		}
+		else if (event.widget_id == known_card_menu && asking_player_turn_order == 0)
+		{
+			known_card = known_card_menu.get_selection();
 		}
 
 	} while(true);
@@ -911,23 +866,12 @@ void display::display_overview(const std::vector<data::player_cards>& known_card
 	report_board.build();
 	accusation_suggestions_label.set_output(database.generate_accusation_probability_report(known_cards));
 	investigation_suggestions_label.set_output(database.generate_investigation_report(known_cards));
-	report_frame->display();
 
-	int input = ascii_io::undefined;
-
+	console::event event;
 	do
 	{
-		input = report_frame->get_selection();
-
-		if (input == accusation_suggestions_label)
-		{
-			accusation_suggestions_label.scroll();
-		}
-		else if (input == investigation_suggestions_label)
-		{
-			investigation_suggestions_label.scroll();
-		}
-	} while (!(report_frame->selection_exit_key_used() && input == ascii_io::q));
+		event = report_console.run();
+	} while (event.input != ascii_io::q);
 }
 
 bool display::display_save(data& database)
@@ -937,7 +881,6 @@ bool display::display_save(data& database)
 	do
 	{
 		unsigned int exit_keystroke = save_text_box.write();
-		ascii_io::hide_cursor();
 		if (exit_keystroke == ascii_io::enter)
 		{
 			std::string game_name = save_text_box.get_text();
